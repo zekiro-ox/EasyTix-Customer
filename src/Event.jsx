@@ -5,9 +5,9 @@ const EventsPage = () => {
   return (
     <div className="bg-white-200 min-h-screen">
       <nav className="bg-neutral-950 p-4 text-white rounded-md">
-        <div className="container mx-auto flex justify-between items-center">
-          <div className="text-lg font-bold">EasyTix</div>
-          <div className="flex gap-4">
+        <div className="container mx-auto flex justify-between items-center flex-wrap">
+          <div className="text-2xl font-bold">EasyTix</div>
+          <div className="flex gap-4 flex-wrap">
             <Link to="/customer-homepage" className="hover:text-blue-400">
               Home
             </Link>
@@ -26,14 +26,14 @@ const EventsPage = () => {
           </div>
         </div>
       </nav>
-      <div className="container mx-auto mt-8 p-10 bg-white rounded-lg shadow-lg">
-        <div className="flex flex-col lg:flex-row">
+      <div className="container mx-auto mt-8 p-4 bg-white rounded-lg shadow-lg">
+        <div className="flex flex-col lg:flex-row lg:space-x-4">
           <div className="lg:w-1/3">
-            <div className="w-full h-96 bg-gray-300 rounded-lg mb-4">
+            <div className="w-full h-64 bg-gray-300 rounded-lg mb-4">
               <img
                 src="src/assets/Manawari.jpg"
                 alt="MANAWARI"
-                className="rounded-lg mb-4"
+                className="rounded-lg mb-4 w-full object-cover h-full"
               />
             </div>
             <h2 className="text-xl font-bold">MANAWARI</h2>
@@ -43,7 +43,7 @@ const EventsPage = () => {
             <Link to="/buy-ticket" className="no-underline text-black">
               <button
                 type="button"
-                className="w-80 bg-neutral-950 text-white p-2 rounded-md hover:bg-blue-400"
+                className="w-full bg-neutral-950 text-white p-2 rounded-md hover:bg-blue-400"
               >
                 Buy Ticket Now
               </button>
@@ -51,7 +51,7 @@ const EventsPage = () => {
           </div>
           <div className="lg:w-2/3 lg:pl-10">
             <h3 className="text-lg font-bold mb-3">Event Description</h3>
-            <div className="event-description mb-4 bg-white p-10 rounded-lg shadow-lg">
+            <div className="event-description mb-4 bg-white p-4 rounded-lg shadow-lg">
               <p className="mb-4">
                 Experience the vibrant performances and immerse yourself in the
                 rhythm of the night.

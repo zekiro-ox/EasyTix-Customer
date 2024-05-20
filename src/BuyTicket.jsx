@@ -51,9 +51,9 @@ const BuyTicketPage = () => {
   return (
     <div className="bg-white-200 min-h-screen">
       <nav className="bg-neutral-950 p-4 text-white rounded-md">
-        <div className="container mx-auto flex justify-between items-center">
-          <div className="text-lg font-bold">EasyTix</div>
-          <div className="flex gap-4">
+        <div className="container mx-auto flex justify-between items-center flex-wrap">
+          <div className="text-2xl font-bold">EasyTix</div>
+          <div className="flex gap-4 flex-wrap">
             <Link to="/customer-homepage" className="hover:text-blue-400">
               Home
             </Link>
@@ -72,31 +72,31 @@ const BuyTicketPage = () => {
           </div>
         </div>
       </nav>
-      <div className="container mx-auto mt-8 p-10 bg-white rounded-lg drop-shadow-lg flex">
-        <div className="w-1/2">
+      <div className="container mx-auto mt-8 p-4 md:p-10 bg-white rounded-lg drop-shadow-lg flex flex-col md:flex-row">
+        <div className="w-full md:w-1/2">
           {/* Placeholder for event image */}
           <div className="h-70 bg-gray-300 rounded-lg mb-5">
             <img
-              src="src\assets\SEATMAP.png"
+              src="src/assets/SEATMAP.png"
               alt="MANAWARI"
-              className="rounded-lg mb-4"
+              className="rounded-lg mb-4 w-full"
             />
           </div>
           <div className="flex justify-between">
             <div className="text-center">
-              <div className="w-8 h-8 bg-green-500 rounded-full mb-1"></div>
+              <div className="w-8 h-8 bg-green-500 rounded-full mb-1 mx-auto"></div>
               <span>Screen</span>
             </div>
             <div className="text-center">
-              <div className="w-8 h-8 bg-blue-500 rounded-full mb-1"></div>
+              <div className="w-8 h-8 bg-blue-500 rounded-full mb-1 mx-auto"></div>
               <span>GEN AD</span>
             </div>
             <div className="text-center">
-              <div className="w-8 h-8 bg-yellow-500 rounded-full mb-1"></div>
+              <div className="w-8 h-8 bg-yellow-500 rounded-full mb-1 mx-auto"></div>
               <span>VIP STANDING</span>
             </div>
             <div className="text-center">
-              <div className="w-8 h-8 bg-red-500 rounded-full mb-1"></div>
+              <div className="w-8 h-8 bg-red-500 rounded-full mb-1 mx-auto"></div>
               <span>VIP SEATED</span>
             </div>
           </div>
@@ -105,7 +105,7 @@ const BuyTicketPage = () => {
           <p>5:00 PM</p>
           <p>CCA Quadrangle</p>
         </div>
-        <div className="w-1/2 pl-10 mt-10">
+        <div className="w-full md:w-1/2 pl-0 md:pl-10 mt-10 md:mt-0">
           <form onSubmit={handlePurchase}>
             <div className="mb-4">
               <label
@@ -119,7 +119,7 @@ const BuyTicketPage = () => {
                 id="fullName"
                 name="fullName"
                 required
-                className="mt-1 p-2 border border-gray-300 rounded-md w-80"
+                className="mt-1 p-2 border border-gray-300 rounded-md w-full"
                 onChange={(e) => setFullName(e.target.value)}
               />
             </div>
@@ -135,7 +135,7 @@ const BuyTicketPage = () => {
                 id="email"
                 name="email"
                 required
-                className="mt-1 p-2 border border-gray-300 rounded-md w-80"
+                className="mt-1 p-2 border border-gray-300 rounded-md w-full"
                 onChange={(e) => setEmail(e.target.value)}
               />
             </div>
@@ -151,7 +151,7 @@ const BuyTicketPage = () => {
                 id="phoneNumber"
                 name="phoneNumber"
                 required
-                className="mt-1 p-2 border border-gray-300 rounded-md w-80"
+                className="mt-1 p-2 border border-gray-300 rounded-md w-full"
                 onChange={(e) => setPhoneNumber(e.target.value)}
               />
             </div>
@@ -166,7 +166,7 @@ const BuyTicketPage = () => {
                 id="ticketType"
                 name="ticketType"
                 required
-                className="mt-1 p-2 border border-gray-300 rounded-md w-80"
+                className="mt-1 p-2 border border-gray-300 rounded-md w-full"
                 value={ticketType}
                 onChange={(e) => setTicketType(e.target.value)}
               >
@@ -196,7 +196,7 @@ const BuyTicketPage = () => {
                 name="quantity"
                 min="1"
                 required
-                className="mt-1 p-2 border border-gray-300 rounded-md w-80"
+                className="mt-1 p-2 border border-gray-300 rounded-md w-full"
                 value={quantity}
                 onChange={(e) => setQuantity(parseInt(e.target.value))}
               />
@@ -208,7 +208,7 @@ const BuyTicketPage = () => {
             </div>
             <button
               type="submit"
-              className="w-80 bg-neutral-950 text-white p-2 rounded-md hover:bg-blue-400"
+              className="w-full bg-neutral-950 text-white p-2 rounded-md hover:bg-blue-400"
             >
               Purchase
             </button>

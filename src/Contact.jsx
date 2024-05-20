@@ -51,11 +51,11 @@ const ContactUsPage = () => {
   }, []);
 
   return (
-    <div className="bg-white-200 min-h-screen">
+    <div className="bg-gray-200 min-h-screen">
       <nav className="bg-neutral-950 p-4 text-white rounded-md">
-        <div className="container mx-auto flex justify-between items-center">
-          <div className="text-lg font-bold">EasyTix</div>
-          <div className="flex gap-4">
+        <div className="container mx-auto flex justify-between items-center flex-wrap">
+          <div className="text-2xl font-bold">EasyTix</div>
+          <div className="flex gap-4 flex-wrap">
             <Link to="/customer-homepage" className="hover:text-blue-400">
               Home
             </Link>
@@ -74,12 +74,9 @@ const ContactUsPage = () => {
           </div>
         </div>
       </nav>
-      <div className="container p-10">
-        <h2 className="text-3xl font-bold mb-4">Contact Us</h2>
-        <form
-          onSubmit={handleSubmit}
-          className="bg-white p-10 rounded-sm drop-shadow-lg"
-        >
+      <div className="container mx-auto p-4 sm:p-10 bg-white rounded-lg shadow-lg">
+        <h2 className="text-3xl font-bold mb-4 text-center">Contact Us</h2>
+        <form onSubmit={handleSubmit} className="space-y-6">
           <div className="mb-4">
             <label
               htmlFor="name"
@@ -92,7 +89,7 @@ const ContactUsPage = () => {
               id="name"
               name="name"
               required
-              className="mt-1 p-2 border border-gray-300 rounded-md w-80"
+              className="mt-1 p-2 border border-gray-300 rounded-md w-60"
               onChange={(e) => setName(e.target.value)}
             />
           </div>
@@ -108,7 +105,7 @@ const ContactUsPage = () => {
               id="email"
               name="email"
               required
-              className="mt-1 p-2 border border-gray-300 rounded-md w-80"
+              className="mt-1 p-2 border border-gray-300 rounded-md w-60"
               onChange={(e) => setEmail(e.target.value)}
             />
           </div>
@@ -124,19 +121,21 @@ const ContactUsPage = () => {
               name="message"
               rows="4"
               required
-              className="mt-1 p-2 border border-gray-300 rounded-md w-80"
+              className="mt-1 p-2 border border-gray-300 rounded-md w-60"
               onChange={(e) => setMessage(e.target.value)}
             ></textarea>
           </div>
           <button
             type="submit"
-            className="w-80 bg-neutral-950 text-white p-2 rounded-md hover:bg-blue-400"
+            className="w-60 sm:w-80 bg-neutral-950 text-white p-2 rounded-md hover:bg-blue-400"
           >
             Send Message
           </button>
         </form>
         <div className="mt-10">
-          <h3 className="text-2xl font-bold mb-4">Inquiries History</h3>
+          <h3 className="text-2xl font-bold mb-4 text-center">
+            Inquiries History
+          </h3>
           <div className="space-y-4">
             {inquiriesHistory.map((inquiry) => (
               <div key={inquiry.id} className="bg-white p-4 rounded-md shadow">
