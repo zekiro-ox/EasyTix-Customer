@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { MenuIcon, XIcon, UserCircleIcon } from "@heroicons/react/outline";
+import QRCode from "qrcode.react";
 
 const BuyTicketPage = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -36,19 +37,34 @@ const BuyTicketPage = () => {
 
   const handlePurchase = (e) => {
     e.preventDefault();
-    setPurchaseHistory([
-      ...purchaseHistory,
-      {
-        fullName,
-        email,
-        phoneNumber,
-        ticketType,
-        quantity,
-        totalAmount,
-        date: new Date().toLocaleDateString(),
-      },
-    ]);
+
+    // Create a unique QR code data for each purchase
+    const qrCodeData = JSON.stringify({
+      fullName,
+      email,
+      phoneNumber,
+      ticketType,
+      quantity,
+      totalAmount,
+      date: new Date().toLocaleDateString(),
+    });
+
+    // Create a new purchase object including the QR code data
+    const newPurchase = {
+      fullName,
+      email,
+      phoneNumber,
+      ticketType,
+      quantity,
+      totalAmount,
+      date: new Date().toLocaleDateString(),
+      qrCodeData, // Store the QR code data in the purchase object
+    };
+
+    // Add the new purchase to the purchase history
+    setPurchaseHistory([...purchaseHistory, newPurchase]);
   };
+
   const toggleProfileMenu = () => {
     setIsProfileMenuOpen(!isProfileMenuOpen);
   };
@@ -340,6 +356,13 @@ const BuyTicketPage = () => {
               key={index}
               className="mb-4 p-4 border border-gray-200 rounded-lg"
             >
+              <div className="flex justify-center mt-4">
+                <QRCode
+                  value={purchase.qrCodeData}
+                  size={128}
+                  includeMargin={true}
+                />
+              </div>
               <p className="text-sm font-semibold">
                 <span className="text-gray-600">Full Name:</span>{" "}
                 {purchase.fullName}
