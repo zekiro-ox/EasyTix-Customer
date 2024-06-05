@@ -210,7 +210,7 @@ const BuyTicketPage = () => {
           {/* Placeholder for event image */}
           <div className="h-70 bg-gray-300 rounded-lg mb-5">
             <img
-              src="https://assets.pinterest.com/ext/embed.html?id=780530179200327582"
+              src="https://drive.google.com/file/d/1tolIZ3Vv3j__Voevo3ZI6lCK0Op5xuAQ/view?usp=sharing"
               alt="MANAWARI"
               className="rounded-lg mb-4 w-full"
             />
