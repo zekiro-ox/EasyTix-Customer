@@ -150,7 +150,7 @@ const EventsPage = () => {
           <div className="lg:w-1/3">
             <div className="w-full h-64 bg-gray-300 rounded-lg mb-4">
               <img
-                src="src/assets/Manawari.jpg"
+                src="https://marketplace.canva.com/EAFJMl8KcjI/1/0/1131w/canva-purple-black-tropical-party-club-poster-orVwDS2lrfY.jpg"
                 alt="MANAWARI"
                 className="rounded-lg mb-4 w-full object-cover h-full"
               />
