@@ -210,7 +210,7 @@ const BuyTicketPage = () => {
           {/* Placeholder for event image */}
           <div className="h-70 bg-gray-300 rounded-lg mb-5">
             <img
-              src="src/assets/SEATMAP.png"
+              src="https://www.canva.com/design/DAGHRY7KQfI/uS_md9KyQRUqtIFVdMJYCw/view"
               alt="MANAWARI"
               className="rounded-lg mb-4 w-full"
             />

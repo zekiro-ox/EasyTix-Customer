@@ -155,7 +155,7 @@ const CustomerHomePage = () => {
           <Link to="/events" className="no-underline text-black">
             <div className="bg-white p-4 rounded-lg drop-shadow-lg cursor-pointer">
               <img
-                src="src/assets/Manawari.jpg"
+                src="https://marketplace.canva.com/EAFJMl8KcjI/1/0/1131w/canva-purple-black-tropical-party-club-poster-orVwDS2lrfY.jpg"
                 alt="MANAWARI"
                 className="rounded-lg mb-4 w-full"
               />
@@ -168,7 +168,7 @@ const CustomerHomePage = () => {
           <Link to="/events" className="no-underline text-black">
             <div className="bg-white p-4 rounded-lg drop-shadow-lg cursor-pointer">
               <img
-                src="src/assets/Manawari.jpg"
+                src="https://marketplace.canva.com/EAFJMl8KcjI/1/0/1131w/canva-purple-black-tropical-party-club-poster-orVwDS2lrfY.jpg"
                 alt="MANAWARI"
                 className="rounded-lg mb-4 w-full"
               />
@@ -181,7 +181,7 @@ const CustomerHomePage = () => {
           <Link to="/events" className="no-underline text-black">
             <div className="bg-white p-4 rounded-lg drop-shadow-lg cursor-pointer">
               <img
-                src="src/assets/Manawari.jpg"
+                src="https://marketplace.canva.com/EAFJMl8KcjI/1/0/1131w/canva-purple-black-tropical-party-club-poster-orVwDS2lrfY.jpg"
                 alt="MANAWARI"
                 className="rounded-lg mb-4 w-full"
               />
