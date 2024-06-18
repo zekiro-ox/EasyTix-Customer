@@ -35,7 +35,7 @@ const CustomerLoginPage = () => {
       <div className="w-full max-w-md space-y-8">
         <form onSubmit={handleLogin} className="mt-8 space-y-6">
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Login to EasyTix
+            Login Now
           </h2>
           <div>
             <label htmlFor="email" className="sr-only">
