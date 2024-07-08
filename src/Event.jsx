@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { MenuIcon, XIcon, UserCircleIcon } from "@heroicons/react/outline";
+import Poster from "./assets/Manawari.jpg";
 
 const EventsPage = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -150,7 +151,7 @@ const EventsPage = () => {
           <div className="lg:w-1/3">
             <div className="w-full h-64 bg-gray-300 rounded-lg mb-4">
               <img
-                src="https://marketplace.canva.com/EAFJMl8KcjI/1/0/1131w/canva-purple-black-tropical-party-club-poster-orVwDS2lrfY.jpg"
+                src={Poster}
                 alt="MANAWARI"
                 className="rounded-lg mb-4 w-full object-cover h-full"
               />

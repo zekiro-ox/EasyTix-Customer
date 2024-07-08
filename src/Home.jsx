@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { MenuIcon, XIcon, UserCircleIcon } from "@heroicons/react/outline";
+import Poster from "./assets/Manawari.jpg";
 
 const CustomerHomePage = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -11,8 +12,8 @@ const CustomerHomePage = () => {
   };
 
   return (
-    <div className="bg-white-200 min-h-screen">
-      <nav className="bg-neutral-950">
+    <div className="bg-gray-900 min-h-screen text-white">
+      <nav className="bg-purple-900">
         <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
           <div className="relative flex items-center justify-between h-16">
             {/* Mobile menu button */}
@@ -51,25 +52,29 @@ const CustomerHomePage = () => {
                   {/* Navigation links */}
                   <Link
                     to="/customer-homepage"
-                    className="font-bold text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm"
+                    className="font-bold text-white hover:bg-gray-900 hover:text-white px-3 py-2 rounded-md text-sm"
+                    style={{ fontFamily: "Bebas Neue, sans-serif" }}
                   >
                     Home
                   </Link>
                   <Link
                     to="/events"
-                    className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-light"
+                    className="text-white hover:bg-gray-900 hover:text-white px-3 py-2 rounded-md text-sm font-light"
+                    style={{ fontFamily: "Bebas Neue, sans-serif" }}
                   >
                     Events
                   </Link>
                   <Link
                     to="/buy-ticket"
-                    className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-light"
+                    className="text-white hover:bg-gray-900 hover:text-white px-3 py-2 rounded-md text-sm font-light"
+                    style={{ fontFamily: "Bebas Neue, sans-serif" }}
                   >
                     Buy Ticket
                   </Link>
                   <Link
                     to="/contact-us"
-                    className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-light"
+                    className="text-white hover:bg-gray-900 hover:text-white px-3 py-2 rounded-md text-sm font-light"
+                    style={{ fontFamily: "Bebas Neue, sans-serif" }}
                   >
                     Contact Us
                   </Link>
@@ -80,7 +85,7 @@ const CustomerHomePage = () => {
             <div className="relative ml-3">
               <button
                 onClick={toggleProfileMenu}
-                className="bg-neutral-950 p-1 rounded-full text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-neutral-950"
+                className="bg-black p-1 rounded-full text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-black"
                 id="user-menu-button"
                 aria-expanded="false"
                 aria-haspopup="true"
@@ -102,6 +107,7 @@ const CustomerHomePage = () => {
                 <Link
                   to="/logout"
                   className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  style={{ fontFamily: "Bebas Neue, sans-serif" }}
                   role="menuitem"
                   tabIndex="-1"
                 >
@@ -120,26 +126,30 @@ const CustomerHomePage = () => {
             {/* Mobile navigation links */}
             <Link
               to="/customer-homepage"
-              className="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-bold"
+              className="text-white hover:bg-gray-900 hover:text-white block px-3 py-2 rounded-md text-base font-bold"
               aria-current="page"
+              style={{ fontFamily: "Bebas Neue, sans-serif" }}
             >
               Home
             </Link>
             <Link
               to="/events"
-              className="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-light"
+              className="text-white hover:bg-gray-900 hover:text-white block px-3 py-2 rounded-md text-base font-light"
+              style={{ fontFamily: "Bebas Neue, sans-serif" }}
             >
               Events
             </Link>
             <Link
               to="/buy-ticket"
-              className="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-light"
+              className="text-white hover:bg-gray-900 hover:text-white block px-3 py-2 rounded-md text-base font-light"
+              style={{ fontFamily: "Bebas Neue, sans-serif" }}
             >
               Buy Ticket
             </Link>
             <Link
               to="/contact-us"
-              className="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-light"
+              className="text-white hover:bg-gray-900 hover:text-white block px-3 py-2 rounded-md text-base font-light"
+              style={{ fontFamily: "Bebas Neue, sans-serif" }}
             >
               Contact Us
             </Link>
@@ -147,50 +157,108 @@ const CustomerHomePage = () => {
         </div>
       </nav>
       <div className="container mx-auto mt-8 px-4">
-        <h1 className="text-2xl font-bold mb-10 text-center">
-          Welcome to EasyTix!
-        </h1>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           {/* Event Section */}
           <Link to="/events" className="no-underline text-black">
-            <div className="bg-white p-4 rounded-lg drop-shadow-lg cursor-pointer">
+            <div className="bg-gray-800 p-4 rounded-lg drop-shadow-lg cursor-pointer">
               <img
-                src="https://marketplace.canva.com/EAFJMl8KcjI/1/0/1131w/canva-purple-black-tropical-party-club-poster-orVwDS2lrfY.jpg"
+                src={Poster}
                 alt="MANAWARI"
                 className="rounded-lg mb-4 w-full"
               />
-              <h2 className="text-lg font-bold">MANAWARI</h2>
-              <p>December 17, 2023</p>
-              <p>6:00 PM</p>
-              <p>CCA Quadrangle</p>
+              <h2
+                className="text-lg font-extrabold text-purple-600"
+                style={{ fontFamily: "Bebas Neue, sans-serif" }}
+              >
+                MANAWARI
+              </h2>
+              <p
+                className="text-white"
+                style={{ fontFamily: "Bebas Neue, sans-serif" }}
+              >
+                December 17, 2023
+              </p>
+              <p
+                className="text-white"
+                style={{ fontFamily: "Bebas Neue, sans-serif" }}
+              >
+                6:00 PM
+              </p>
+              <p
+                className="text-white"
+                style={{ fontFamily: "Bebas Neue, sans-serif" }}
+              >
+                CCA Quadrangle
+              </p>
             </div>
           </Link>
           <Link to="/events" className="no-underline text-black">
-            <div className="bg-white p-4 rounded-lg drop-shadow-lg cursor-pointer">
+            <div className="bg-gray-800 p-4 rounded-lg drop-shadow-lg cursor-pointer">
               <img
-                src="https://marketplace.canva.com/EAFJMl8KcjI/1/0/1131w/canva-purple-black-tropical-party-club-poster-orVwDS2lrfY.jpg"
+                src={Poster}
                 alt="MANAWARI"
                 className="rounded-lg mb-4 w-full"
               />
-              <h2 className="text-lg font-bold">MANAWARI</h2>
-              <p>December 17, 2023</p>
-              <p>6:00 PM</p>
-              <p>CCA Quadrangle</p>
+              <h2
+                className="text-lg font-extrabold text-purple-600"
+                style={{ fontFamily: "Bebas Neue, sans-serif" }}
+              >
+                MANAWARI
+              </h2>
+              <p
+                className="text-white"
+                style={{ fontFamily: "Bebas Neue, sans-serif" }}
+              >
+                December 17, 2023
+              </p>
+              <p
+                className="text-white"
+                style={{ fontFamily: "Bebas Neue, sans-serif" }}
+              >
+                6:00 PM
+              </p>
+              <p
+                className="text-white"
+                style={{ fontFamily: "Bebas Neue, sans-serif" }}
+              >
+                CCA Quadrangle
+              </p>
             </div>
           </Link>
           <Link to="/events" className="no-underline text-black">
-            <div className="bg-white p-4 rounded-lg drop-shadow-lg cursor-pointer">
+            <div className="bg-gray-800 p-4 rounded-lg drop-shadow-lg cursor-pointer">
               <img
-                src="https://marketplace.canva.com/EAFJMl8KcjI/1/0/1131w/canva-purple-black-tropical-party-club-poster-orVwDS2lrfY.jpg"
+                src={Poster}
                 alt="MANAWARI"
                 className="rounded-lg mb-4 w-full"
               />
-              <h2 className="text-lg font-bold">MANAWARI</h2>
-              <p>December 17, 2023</p>
-              <p>6:00 PM</p>
-              <p>CCA Quadrangle</p>
+              <h2
+                className="text-lg font-extrabold text-purple-600"
+                style={{ fontFamily: "Bebas Neue, sans-serif" }}
+              >
+                MANAWARI
+              </h2>
+              <p
+                className="text-white"
+                style={{ fontFamily: "Bebas Neue, sans-serif" }}
+              >
+                December 17, 2023
+              </p>
+              <p
+                className="text-white"
+                style={{ fontFamily: "Bebas Neue, sans-serif" }}
+              >
+                6:00 PM
+              </p>
+              <p
+                className="text-white"
+                style={{ fontFamily: "Bebas Neue, sans-serif" }}
+              >
+                CCA Quadrangle
+              </p>
             </div>
           </Link>
+
           {/* Repeat for other events */}
         </div>
       </div>
