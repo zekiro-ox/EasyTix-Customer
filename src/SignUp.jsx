@@ -24,11 +24,11 @@ const CustomerSignUpPage = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 py-12 sm:px-6 lg:px-8 bg-black">
+    <div className="min-h-screen flex items-center justify-center px-4 py-12 sm:px-6 lg:px-8 bg-neutral-900">
       <div className="w-full max-w-md space-y-8">
         <form onSubmit={handleSignUp} className="mt-8 space-y-6">
           <h2
-            className="text-center text-3xl font-extrabold text-red-600"
+            className="text-center text-3xl font-extrabold text-violet-500"
             style={{ fontFamily: "Bebas Neue, sans-serif" }}
           >
             Create an Account
@@ -45,7 +45,6 @@ const CustomerSignUpPage = () => {
               className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-red-600 focus:border-red-600 focus:z-10 sm:text-sm"
               placeholder="Username"
               onChange={(e) => setUsername(e.target.value)}
-              style={{ fontFamily: "Bebas Neue, sans-serif" }}
             />
           </div>
           <div>
@@ -61,7 +60,6 @@ const CustomerSignUpPage = () => {
               className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-red-600 focus:border-red-600 focus:z-10 sm:text-sm"
               placeholder="Email address"
               onChange={(e) => setEmail(e.target.value)}
-              style={{ fontFamily: "Bebas Neue, sans-serif" }}
             />
           </div>
           <div>
@@ -77,7 +75,6 @@ const CustomerSignUpPage = () => {
               className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-red-600 focus:border-red-600 focus:z-10 sm:text-sm"
               placeholder="Password"
               onChange={(e) => setPassword(e.target.value)}
-              style={{ fontFamily: "Bebas Neue, sans-serif" }}
             />
           </div>
           <div>
@@ -93,7 +90,6 @@ const CustomerSignUpPage = () => {
               className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-red-600 focus:border-red-600 focus:z-10 sm:text-sm"
               placeholder="Confirm Password"
               onChange={(e) => setConfirmPassword(e.target.value)}
-              style={{ fontFamily: "Bebas Neue, sans-serif" }}
             />
           </div>
           <div className="flex items-center justify-between">
@@ -117,7 +113,7 @@ const CustomerSignUpPage = () => {
           <div>
             <button
               type="submit"
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-600"
+              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-violet-800 hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-600"
               style={{ fontFamily: "Bebas Neue, sans-serif" }}
             >
               Sign up
@@ -130,7 +126,7 @@ const CustomerSignUpPage = () => {
             Don't have an account?{" "}
             <Link
               to="/login"
-              className="font-medium text-red-600 hover:text-red-700"
+              className="font-medium text-violet-500 hover:text-violet-700"
               style={{ fontFamily: "Bebas Neue, sans-serif" }}
             >
               Log in here

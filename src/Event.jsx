@@ -10,9 +10,10 @@ const EventsPage = () => {
   const toggleProfileMenu = () => {
     setIsProfileMenuOpen(!isProfileMenuOpen);
   };
+
   return (
-    <div className="bg-white-200 min-h-screen">
-      <nav className="bg-neutral-950">
+    <div className="bg-neutral-900 min-h-screen text-white">
+      <nav className="bg-black">
         <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
           <div className="relative flex items-center justify-between h-16">
             {/* Mobile menu button */}
@@ -51,25 +52,29 @@ const EventsPage = () => {
                   {/* Navigation links */}
                   <Link
                     to="/customer-homepage"
-                    className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-light"
+                    className="text-white hover:bg-gray-900 hover:text-white px-3 py-2 rounded-md text-lg font-light"
+                    style={{ fontFamily: "Bebas Neue, sans-serif" }}
                   >
                     Home
                   </Link>
                   <Link
                     to="/events"
-                    className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-bold"
+                    className="text-white hover:bg-gray-900 hover:text-white px-3 py-2 rounded-md text-lg font-bold"
+                    style={{ fontFamily: "Bebas Neue, sans-serif" }}
                   >
                     Events
                   </Link>
                   <Link
                     to="/buy-ticket"
-                    className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-light"
+                    className="text-white hover:bg-gray-900 hover:text-white px-3 py-2 rounded-md text-lg font-light"
+                    style={{ fontFamily: "Bebas Neue, sans-serif" }}
                   >
                     Buy Ticket
                   </Link>
                   <Link
                     to="/contact-us"
-                    className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-light"
+                    className="text-white hover:bg-gray-900 hover:text-white px-3 py-2 rounded-md text-lg font-light"
+                    style={{ fontFamily: "Bebas Neue, sans-serif" }}
                   >
                     Contact Us
                   </Link>
@@ -80,7 +85,7 @@ const EventsPage = () => {
             <div className="relative ml-3">
               <button
                 onClick={toggleProfileMenu}
-                className="bg-neutral-950 p-1 rounded-full text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-neutral-950"
+                className="bg-black p-1 rounded-full text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-black"
                 id="user-menu-button"
                 aria-expanded="false"
                 aria-haspopup="true"
@@ -102,6 +107,7 @@ const EventsPage = () => {
                 <Link
                   to="/logout"
                   className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  style={{ fontFamily: "Bebas Neue, sans-serif" }}
                   role="menuitem"
                   tabIndex="-1"
                 >
@@ -120,58 +126,86 @@ const EventsPage = () => {
             {/* Mobile navigation links */}
             <Link
               to="/customer-homepage"
-              className="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-light"
+              className="text-white hover:bg-gray-900 hover:text-white block px-3 py-2 rounded-md text-base font-light"
               aria-current="page"
+              style={{ fontFamily: "Bebas Neue, sans-serif" }}
             >
               Home
             </Link>
             <Link
               to="/events"
-              className="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-bold"
+              className="text-white hover:bg-gray-900 hover:text-white block px-3 py-2 rounded-md text-base font-bold"
+              style={{ fontFamily: "Bebas Neue, sans-serif" }}
             >
               Events
             </Link>
             <Link
               to="/buy-ticket"
-              className="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-light"
+              className="text-white hover:bg-gray-900 hover:text-white block px-3 py-2 rounded-md text-base font-light"
+              style={{ fontFamily: "Bebas Neue, sans-serif" }}
             >
               Buy Ticket
             </Link>
             <Link
               to="/contact-us"
-              className="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-light"
+              className="text-white hover:bg-gray-900 hover:text-white block px-3 py-2 rounded-md text-base font-light"
+              style={{ fontFamily: "Bebas Neue, sans-serif" }}
             >
               Contact Us
             </Link>
           </div>
         </div>
       </nav>
-      <div className="container mx-auto mt-8 p-4 bg-white rounded-lg shadow-lg">
-        <div className="flex flex-col lg:flex-row lg:space-x-4">
-          <div className="lg:w-1/3">
-            <div className="w-full h-64 bg-gray-300 rounded-lg mb-4">
-              <img
-                src={Poster}
-                alt="MANAWARI"
-                className="rounded-lg mb-4 w-full object-cover h-full"
-              />
-            </div>
-            <h2 className="text-xl font-bold">MANAWARI</h2>
-            <p>December 17, 2023</p>
-            <p>5:00 PM</p>
-            <p>CCA Quadrangle</p>
+      <div className="container mx-auto mt-12 px-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div className="bg-neutral-800 p-4 rounded-lg drop-shadow-lg">
+            <img
+              src={Poster}
+              alt="MANAWARI"
+              className="rounded-lg mb-4 w-full object-cover h-64"
+            />
+            <h2
+              className="text-2xl font-extrabold text-violet-500"
+              style={{ fontFamily: "Bebas Neue, sans-serif" }}
+            >
+              MANAWARI
+            </h2>
+            <p
+              className="text-white"
+              style={{ fontFamily: "Bebas Neue, sans-serif" }}
+            >
+              December 17, 2023
+            </p>
+            <p
+              className="text-white"
+              style={{ fontFamily: "Bebas Neue, sans-serif" }}
+            >
+              6:00 PM
+            </p>
+            <p
+              className="text-white"
+              style={{ fontFamily: "Bebas Neue, sans-serif" }}
+            >
+              CCA Quadrangle
+            </p>
             <Link to="/buy-ticket" className="no-underline text-black">
               <button
                 type="button"
-                className="w-full bg-neutral-950 text-white p-2 rounded-md hover:bg-blue-400"
+                className="w-full bg-neutral-950 text-white p-2 rounded-md hover:bg-violet-800 mt-4"
+                style={{ fontFamily: "Bebas Neue, sans-serif" }}
               >
                 Buy Ticket Now
               </button>
             </Link>
           </div>
-          <div className="lg:w-2/3 lg:pl-10">
-            <h3 className="text-lg font-bold mb-3">Event Description</h3>
-            <div className="event-description mb-4 bg-white p-4 rounded-lg shadow-lg">
+          <div className="bg-neutral-800 p-4 rounded-lg drop-shadow-lg">
+            <h3
+              className="text-2xl font-semibold mb-3"
+              style={{ fontFamily: "Bebas Neue, sans-serif" }}
+            >
+              Event Description
+            </h3>
+            <div className="event-description mb-4 bg-neutral-700 p-4 rounded-lg shadow-lg">
               <p className="mb-4">
                 Experience the vibrant performances and immerse yourself in the
                 rhythm of the night.
@@ -179,21 +213,27 @@ const EventsPage = () => {
               <p className="mb-4">
                 The CCA Quadrangle is a spacious outdoor venue that offers a
                 perfect setting for live performances. With state-of-the-art
-                sound and lighting systems, every note of music and every beat
-                will resonate with crystal clarity. The venue is easily
-                accessible by public transportation and has ample parking for
-                those who prefer to drive.
+                sound and lighting systems, every event at the CCA Quadrangle is
+                a memorable experience.
+              </p>
+            </div>
+            <h3
+              className="text-2xl font-semibold mb-3"
+              style={{ fontFamily: "Bebas Neue, sans-serif" }}
+            >
+              Venue Information
+            </h3>
+            <div className="venue-information bg-neutral-700 p-4 rounded-lg shadow-lg">
+              <p className="mb-4">
+                The CCA Quadrangle is located at the heart of the city, making
+                it easily accessible by public transportation. It features ample
+                parking space, a variety of food and beverage stalls, and
+                comfortable seating arrangements.
               </p>
               <p className="mb-4">
-                Each ticket type is designed to provide a unique experience
-                tailored to your preferences. Whether you want to be in the
-                heart of the action or enjoy the concert with a bit more
-                comfort, there's a ticket just for you.
+                Address: 123 Event Street, City, State, ZIP Code
               </p>
-              <p className="mb-4">
-                Join us for an unforgettable evening at MANAWARI. Let's
-                celebrate the power of music and community together!
-              </p>
+              <p className="mb-4">Contact: (123) 456-7890</p>
             </div>
           </div>
         </div>

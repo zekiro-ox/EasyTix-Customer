@@ -12,8 +12,8 @@ const CustomerHomePage = () => {
   };
 
   return (
-    <div className="bg-gray-900 min-h-screen text-white">
-      <nav className="bg-purple-900">
+    <div className="bg-neutral-900 min-h-screen text-white">
+      <nav className="bg-black">
         <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
           <div className="relative flex items-center justify-between h-16">
             {/* Mobile menu button */}
@@ -52,28 +52,28 @@ const CustomerHomePage = () => {
                   {/* Navigation links */}
                   <Link
                     to="/customer-homepage"
-                    className="font-bold text-white hover:bg-gray-900 hover:text-white px-3 py-2 rounded-md text-sm"
+                    className="font-bold text-white hover:bg-gray-900 hover:text-white px-3 py-2 rounded-md text-lg"
                     style={{ fontFamily: "Bebas Neue, sans-serif" }}
                   >
                     Home
                   </Link>
                   <Link
                     to="/events"
-                    className="text-white hover:bg-gray-900 hover:text-white px-3 py-2 rounded-md text-sm font-light"
+                    className="text-white hover:bg-gray-900 hover:text-white px-3 py-2 rounded-md text-lg font-light"
                     style={{ fontFamily: "Bebas Neue, sans-serif" }}
                   >
                     Events
                   </Link>
                   <Link
                     to="/buy-ticket"
-                    className="text-white hover:bg-gray-900 hover:text-white px-3 py-2 rounded-md text-sm font-light"
+                    className="text-white hover:bg-gray-900 hover:text-white px-3 py-2 rounded-md text-lg font-light"
                     style={{ fontFamily: "Bebas Neue, sans-serif" }}
                   >
                     Buy Ticket
                   </Link>
                   <Link
                     to="/contact-us"
-                    className="text-white hover:bg-gray-900 hover:text-white px-3 py-2 rounded-md text-sm font-light"
+                    className="text-white hover:bg-gray-900 hover:text-white px-3 py-2 rounded-md text-lg font-light"
                     style={{ fontFamily: "Bebas Neue, sans-serif" }}
                   >
                     Contact Us
@@ -156,18 +156,18 @@ const CustomerHomePage = () => {
           </div>
         </div>
       </nav>
-      <div className="container mx-auto mt-8 px-4">
+      <div className="container mx-auto mt-12 px-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           {/* Event Section */}
           <Link to="/events" className="no-underline text-black">
-            <div className="bg-gray-800 p-4 rounded-lg drop-shadow-lg cursor-pointer">
+            <div className="bg-neutral-800 p-4 rounded-lg drop-shadow-lg cursor-pointer">
               <img
                 src={Poster}
                 alt="MANAWARI"
                 className="rounded-lg mb-4 w-full"
               />
               <h2
-                className="text-lg font-extrabold text-purple-600"
+                className="text-2xl font-extrabold text-violet-500"
                 style={{ fontFamily: "Bebas Neue, sans-serif" }}
               >
                 MANAWARI
@@ -193,14 +193,14 @@ const CustomerHomePage = () => {
             </div>
           </Link>
           <Link to="/events" className="no-underline text-black">
-            <div className="bg-gray-800 p-4 rounded-lg drop-shadow-lg cursor-pointer">
+            <div className="bg-neutral-800 p-4 rounded-lg drop-shadow-lg cursor-pointer">
               <img
                 src={Poster}
                 alt="MANAWARI"
                 className="rounded-lg mb-4 w-full"
               />
               <h2
-                className="text-lg font-extrabold text-purple-600"
+                className="text-2xl font-extrabold text-violet-500"
                 style={{ fontFamily: "Bebas Neue, sans-serif" }}
               >
                 MANAWARI
@@ -226,14 +226,14 @@ const CustomerHomePage = () => {
             </div>
           </Link>
           <Link to="/events" className="no-underline text-black">
-            <div className="bg-gray-800 p-4 rounded-lg drop-shadow-lg cursor-pointer">
+            <div className="bg-neutral-800 p-4 rounded-lg drop-shadow-lg cursor-pointer">
               <img
                 src={Poster}
                 alt="MANAWARI"
                 className="rounded-lg mb-4 w-full"
               />
               <h2
-                className="text-lg font-extrabold text-purple-600"
+                className="text-2xl font-extrabold text-violet-500"
                 style={{ fontFamily: "Bebas Neue, sans-serif" }}
               >
                 MANAWARI

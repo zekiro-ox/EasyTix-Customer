@@ -31,11 +31,11 @@ const CustomerLoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-black px-4 py-12 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex items-center justify-center bg-neutral-900 px-4 py-12 sm:px-6 lg:px-8">
       <div className="flex flex-col items-center justify-center w-full h-full space-y-8">
         <form onSubmit={handleLogin} className="w-full max-w-md space-y-6">
           <h2
-            className="text-center text-3xl font-extrabold text-red-600"
+            className="text-center text-3xl font-extrabold text-violet-500"
             style={{ fontFamily: "Bebas Neue, sans-serif" }}
           >
             Sign In
@@ -53,7 +53,6 @@ const CustomerLoginPage = () => {
               className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-red-600 focus:border-red-600 focus:z-10 sm:text-sm"
               placeholder="Email address"
               onChange={(e) => setEmail(e.target.value)}
-              style={{ fontFamily: "Bebas Neue, sans-serif" }}
             />
           </div>
           <div>
@@ -69,7 +68,6 @@ const CustomerLoginPage = () => {
               className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-red-600 focus:border-red-600 focus:z-10 sm:text-sm"
               placeholder="Password"
               onChange={(e) => setPassword(e.target.value)}
-              style={{ fontFamily: "Bebas Neue, sans-serif" }}
             />
             <div className="mt-1">
               <label
@@ -91,7 +89,7 @@ const CustomerLoginPage = () => {
           <div>
             <button
               type="submit"
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-600"
+              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-violet-800 hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-600"
               style={{ fontFamily: "Bebas Neue, sans-serif" }}
             >
               Sign in
@@ -104,7 +102,7 @@ const CustomerLoginPage = () => {
             Don't have an account?{" "}
             <Link
               to="/signup"
-              className="font-medium text-red-600 hover:text-red-700"
+              className="font-medium text-violet-500 hover:text-violet-300"
               style={{ fontFamily: "Bebas Neue, sans-serif" }}
             >
               Sign-up here
