@@ -191,7 +191,7 @@ const EventsPage = () => {
             <Link to="/buy-ticket" className="no-underline text-black">
               <button
                 type="button"
-                className="w-full bg-neutral-950 text-white p-2 rounded-md hover:bg-violet-800 mt-4"
+                className=" text-white p-2 rounded-md  bg-violet-500 hover:bg-violet-600 mt-4"
                 style={{ fontFamily: "Bebas Neue, sans-serif" }}
               >
                 Buy Ticket Now

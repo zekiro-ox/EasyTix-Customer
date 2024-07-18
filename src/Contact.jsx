@@ -238,7 +238,7 @@ const ContactUsPage = () => {
           </div>
           <button
             type="submit"
-            className="bg-violet-500 text-white px-4 py-2 rounded-md font-bold hover:bg-violet-600"
+            className="text-white px-4 py-2 rounded-md font-bold bg-violet-500 hover:bg-violet-600"
             style={{ fontFamily: "Bebas Neue, sans-serif" }}
           >
             Send Message

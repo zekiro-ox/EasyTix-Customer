@@ -339,7 +339,7 @@ const BuyTicketPage = () => {
             </div>
             <button
               type="submit"
-              className="w-full px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-md"
+              className="w-full px-4 py-2  bg-violet-500 hover:bg-violet-600 text-white font-bold rounded-md"
               style={{ fontFamily: "Bebas Neue, sans-serif" }}
             >
               Purchase
