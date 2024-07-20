@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import Logo from "./assets/CompanyLogo.png";
 
 const CustomerSignUpPage = () => {
   const [username, setUsername] = useState("");
@@ -26,6 +27,9 @@ const CustomerSignUpPage = () => {
   return (
     <div className="min-h-screen flex items-center justify-center px-4 py-12 sm:px-6 lg:px-8 bg-neutral-900">
       <div className="w-full max-w-md space-y-8">
+        <div className="flex items-center justify-center mb-8">
+          <img src={Logo} alt="Company Logo" className="h-20 w-auto" />
+        </div>
         <form onSubmit={handleSignUp} className="mt-8 space-y-6">
           <h2
             className="text-center text-3xl font-extrabold text-violet-500"

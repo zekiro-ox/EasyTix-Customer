@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import Logo from "./assets/CompanyLogo.png";
 
 const CustomerLoginPage = () => {
   const [email, setEmail] = useState("");
@@ -33,6 +34,9 @@ const CustomerLoginPage = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-neutral-900 px-4 py-12 sm:px-6 lg:px-8">
       <div className="flex flex-col items-center justify-center w-full h-full space-y-8">
+        <div className="flex items-center justify-center mb-8">
+          <img src={Logo} alt="Company Logo" className="h-20 w-auto" />
+        </div>
         <form onSubmit={handleLogin} className="w-full max-w-md space-y-6">
           <h2
             className="text-center text-3xl font-extrabold text-violet-500"
