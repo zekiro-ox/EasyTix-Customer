@@ -1,29 +1,26 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import Logo from "./assets/CompanyLogo.png";
 
 const CustomerLoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState("");
   const navigate = useNavigate();
+  const auth = getAuth();
 
-  const premadeAccount = {
-    email: "user@example.com",
-    password: "password123",
-  };
-
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
 
-    if (
-      email === premadeAccount.email &&
-      password === premadeAccount.password
-    ) {
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
       console.log("Login successful");
       navigate("/customer-homepage");
-    } else {
-      console.error("Invalid credentials");
+    } catch (error) {
+      console.error("Invalid credentials", error.message);
+      setError("Invalid email or password. Please try again.");
     }
   };
 
@@ -90,6 +87,14 @@ const CustomerLoginPage = () => {
               </label>
             </div>
           </div>
+          {error && (
+            <div
+              className="text-sm text-center text-red-500"
+              style={{ fontFamily: "Bebas Neue, sans-serif" }}
+            >
+              {error}
+            </div>
+          )}
           <div>
             <button
               type="submit"

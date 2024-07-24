@@ -1,6 +1,8 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Logo from "./assets/CompanyLogo.png";
+import { auth } from "./config/firebase"; // Import the Firebase auth object
+import { createUserWithEmailAndPassword } from "firebase/auth"; // Import Firebase auth methods
 
 const CustomerSignUpPage = () => {
   const [username, setUsername] = useState("");
@@ -8,16 +10,32 @@ const CustomerSignUpPage = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
-  const handleSignUp = (e) => {
+  const handleSignUp = async (e) => {
     e.preventDefault();
-    // Add validation for password and confirm password match
+    setError(null);
+
     if (password !== confirmPassword) {
-      console.error("Passwords do not match");
+      setError("Passwords do not match");
       return;
     }
-    // Handle sign-up logic here
-    console.log("Sign-up credentials", { username, email, password });
+
+    try {
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      // Signed in
+      const user = userCredential.user;
+      console.log("Sign-up successful", user);
+      navigate("/login"); // Redirect to login page after successful signup
+    } catch (error) {
+      console.error("Error signing up", error);
+      setError(error.message);
+    }
   };
 
   const togglePasswordVisibility = () => {
@@ -37,6 +55,9 @@ const CustomerSignUpPage = () => {
           >
             Create an Account
           </h2>
+          {error && (
+            <div className="text-red-500 text-center mb-4">{error}</div>
+          )}
           <div>
             <label htmlFor="username" className="sr-only">
               Username
@@ -127,7 +148,7 @@ const CustomerSignUpPage = () => {
             className="text-sm text-center text-gray-400"
             style={{ fontFamily: "Bebas Neue, sans-serif" }}
           >
-            Don't have an account?{" "}
+            Already have an account?{" "}
             <Link
               to="/login"
               className="font-medium text-violet-500 hover:text-violet-700"
