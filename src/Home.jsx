@@ -25,6 +25,17 @@ const CustomerHomePage = () => {
     fetchEvents();
   }, []);
 
+  const formatTime = (time) => {
+    const [hours, minutes] = time.split(":");
+    const date = new Date();
+    date.setHours(hours, minutes);
+    return date.toLocaleTimeString("en-US", {
+      hour: "numeric",
+      minute: "numeric",
+      hour12: true,
+    });
+  };
+
   return (
     <div className="bg-neutral-900 min-h-screen text-white">
       <nav className="bg-black">
@@ -201,7 +212,7 @@ const CustomerHomePage = () => {
                   className="text-white"
                   style={{ fontFamily: "Bebas Neue, sans-serif" }}
                 >
-                  {event.startTime}
+                  {formatTime(event.startTime)}
                 </p>
                 <p
                   className="text-white"
