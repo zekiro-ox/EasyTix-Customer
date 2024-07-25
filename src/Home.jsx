@@ -1,15 +1,29 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { MenuIcon, XIcon, UserCircleIcon } from "@heroicons/react/outline";
-import Poster from "./assets/Manawari.jpg";
+import { getFirestore, collection, getDocs } from "firebase/firestore";
+import PosterPlaceholder from "./assets/Manawari.jpg";
 
 const CustomerHomePage = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
+  const [events, setEvents] = useState([]);
 
   const toggleProfileMenu = () => {
     setIsProfileMenuOpen(!isProfileMenuOpen);
   };
+
+  useEffect(() => {
+    const fetchEvents = async () => {
+      const db = getFirestore();
+      const eventsCollection = collection(db, "events");
+      const eventsSnapshot = await getDocs(eventsCollection);
+      const eventsList = eventsSnapshot.docs.map((doc) => doc.data());
+      setEvents(eventsList);
+    };
+
+    fetchEvents();
+  }, []);
 
   return (
     <div className="bg-neutral-900 min-h-screen text-white">
@@ -158,108 +172,46 @@ const CustomerHomePage = () => {
       </nav>
       <div className="container mx-auto mt-12 px-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-          {/* Event Section */}
-          <Link to="/events" className="no-underline text-black">
-            <div className="bg-neutral-800 p-4 rounded-lg drop-shadow-lg cursor-pointer">
-              <img
-                src={Poster}
-                alt="MANAWARI"
-                className="rounded-lg mb-4 w-full"
-              />
-              <h2
-                className="text-2xl font-extrabold text-violet-500"
-                style={{ fontFamily: "Bebas Neue, sans-serif" }}
-              >
-                MANAWARI
-              </h2>
-              <p
-                className="text-white"
-                style={{ fontFamily: "Bebas Neue, sans-serif" }}
-              >
-                December 17, 2023
-              </p>
-              <p
-                className="text-white"
-                style={{ fontFamily: "Bebas Neue, sans-serif" }}
-              >
-                6:00 PM
-              </p>
-              <p
-                className="text-white"
-                style={{ fontFamily: "Bebas Neue, sans-serif" }}
-              >
-                CCA Quadrangle
-              </p>
+          {events.length === 0 && (
+            <div className="text-center col-span-3">
+              <p className="text-white text-xl">No events available.</p>
             </div>
-          </Link>
-          <Link to="/events" className="no-underline text-black">
-            <div className="bg-neutral-800 p-4 rounded-lg drop-shadow-lg cursor-pointer">
-              <img
-                src={Poster}
-                alt="MANAWARI"
-                className="rounded-lg mb-4 w-full"
-              />
-              <h2
-                className="text-2xl font-extrabold text-violet-500"
-                style={{ fontFamily: "Bebas Neue, sans-serif" }}
-              >
-                MANAWARI
-              </h2>
-              <p
-                className="text-white"
-                style={{ fontFamily: "Bebas Neue, sans-serif" }}
-              >
-                December 17, 2023
-              </p>
-              <p
-                className="text-white"
-                style={{ fontFamily: "Bebas Neue, sans-serif" }}
-              >
-                6:00 PM
-              </p>
-              <p
-                className="text-white"
-                style={{ fontFamily: "Bebas Neue, sans-serif" }}
-              >
-                CCA Quadrangle
-              </p>
-            </div>
-          </Link>
-          <Link to="/events" className="no-underline text-black">
-            <div className="bg-neutral-800 p-4 rounded-lg drop-shadow-lg cursor-pointer">
-              <img
-                src={Poster}
-                alt="MANAWARI"
-                className="rounded-lg mb-4 w-full"
-              />
-              <h2
-                className="text-2xl font-extrabold text-violet-500"
-                style={{ fontFamily: "Bebas Neue, sans-serif" }}
-              >
-                MANAWARI
-              </h2>
-              <p
-                className="text-white"
-                style={{ fontFamily: "Bebas Neue, sans-serif" }}
-              >
-                December 17, 2023
-              </p>
-              <p
-                className="text-white"
-                style={{ fontFamily: "Bebas Neue, sans-serif" }}
-              >
-                6:00 PM
-              </p>
-              <p
-                className="text-white"
-                style={{ fontFamily: "Bebas Neue, sans-serif" }}
-              >
-                CCA Quadrangle
-              </p>
-            </div>
-          </Link>
-
-          {/* Repeat for other events */}
+          )}
+          {events.map((event, index) => (
+            <Link to="/events" key={index} className="no-underline text-black">
+              <div className="bg-neutral-800 p-4 rounded-lg drop-shadow-lg cursor-pointer">
+                <img
+                  src={event.eventPosterURL || PosterPlaceholder}
+                  alt={event.name}
+                  className="rounded-lg mb-4 w-full h-60 object-cover"
+                />
+                <h2
+                  className="text-2xl font-extrabold text-violet-500"
+                  style={{ fontFamily: "Bebas Neue, sans-serif" }}
+                >
+                  {event.name}
+                </h2>
+                <p
+                  className="text-white"
+                  style={{ fontFamily: "Bebas Neue, sans-serif" }}
+                >
+                  {new Date(event.startDate).toLocaleDateString()}
+                </p>
+                <p
+                  className="text-white"
+                  style={{ fontFamily: "Bebas Neue, sans-serif" }}
+                >
+                  {event.startTime}
+                </p>
+                <p
+                  className="text-white"
+                  style={{ fontFamily: "Bebas Neue, sans-serif" }}
+                >
+                  {event.venue}
+                </p>
+              </div>
+            </Link>
+          ))}
         </div>
       </div>
     </div>
