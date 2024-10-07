@@ -6,6 +6,7 @@ import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import PosterPlaceholder from "./assets/SEATMAP.png";
+import QRCodeStyling from "qr-code-styling";
 
 const BuyTicketPage = () => {
   const [events, setEvents] = useState([]);
@@ -68,6 +69,7 @@ const BuyTicketPage = () => {
 
   const handlePurchase = (e) => {
     e.preventDefault();
+
     const qrCodeData = JSON.stringify({
       fullName,
       email,
@@ -75,6 +77,7 @@ const BuyTicketPage = () => {
       ticketType: selectedTicketType,
       quantity,
       totalAmount,
+      eventName: selectedEvent?.name,
       date: new Date().toLocaleDateString(),
     });
 
@@ -86,6 +89,8 @@ const BuyTicketPage = () => {
       quantity,
       totalAmount,
       date: new Date().toLocaleDateString(),
+      eventName: selectedEvent?.name,
+      eventPosterURL: selectedEvent?.eventPosterURL, // Store the poster URL for the event
       qrCodeData,
     };
 
@@ -120,6 +125,7 @@ const BuyTicketPage = () => {
         >
           Choose Your Event
         </h2>
+
         {events.length > 0 && (
           <Slider {...sliderSettings} className="mb-8">
             {events.map((event) => (
@@ -149,8 +155,9 @@ const BuyTicketPage = () => {
         )}
 
         {selectedEvent && (
-          <div className="mt-8 flex flex-col md:flex-row">
-            <div className="w-full md:w-1/2">
+          <div className="mt-8 flex flex-col md:flex-row justify-between">
+            {/* Seat Map Container */}
+            <div className="md:w-2/3">
               <div className="h-70 bg-gray-300 rounded-lg mb-5">
                 <img
                   src={selectedEvent.seatMapURL || PosterPlaceholder}
@@ -158,6 +165,8 @@ const BuyTicketPage = () => {
                   className="rounded-lg object-cover h-full w-full"
                 />
               </div>
+            </div>
+            <div className="md:w-1/3 ml-0 md:ml-8">
               <form onSubmit={handlePurchase} className="space-y-4">
                 <div>
                   <label
@@ -268,81 +277,80 @@ const BuyTicketPage = () => {
                 </button>
               </form>
             </div>
+          </div>
+        )}
 
-            <div className="w-full md:w-1/2 md:ml-8 mt-8 md:mt-0">
-              <h2
-                className="text-3xl md:text-4xl font-extrabold mb-5"
-                style={{ fontFamily: "Bebas Neue, sans-serif" }}
-              >
-                Purchase History
-              </h2>
-              <div className="space-y-4">
-                {purchaseHistory.map((purchase, index) => (
-                  <div key={index} className="border rounded-md flex flex-row">
-                    <div className="bg-blue-900 text-white p-4 flex flex-col justify-center">
-                      <img src="logo.png" alt="Logo" className="mb-4" />
-                    </div>
-                    <div className=" p-4 flex-1">
-                      <div className="flex justify-between mb-2">
-                        <h3
-                          className="text-xl font-bold"
-                          style={{ fontFamily: "Bebas Neue, sans-serif" }}
-                        >
-                          {purchase.ticketType}
-                        </h3>
-                      </div>
-                      <p
-                        className="text-lg mb-2"
-                        style={{ fontFamily: "Bebas Neue, sans-serif" }}
-                      >
-                        {purchase.fullName}
-                      </p>
-                      <p
-                        className="text-lg mb-2"
-                        style={{ fontFamily: "Bebas Neue, sans-serif" }}
-                      >
-                        {purchase.email}
-                      </p>
-                      <p
-                        className="text-lg mb-2"
-                        style={{ fontFamily: "Bebas Neue, sans-serif" }}
-                      >
-                        {purchase.phoneNumber}
-                      </p>
-                      <p
-                        className="text-lg mb-2"
-                        style={{ fontFamily: "Bebas Neue, sans-serif" }}
-                      >
-                        Quantity: {purchase.quantity}
-                      </p>
-                      <p
-                        className="text-lg mb-2"
-                        style={{ fontFamily: "Bebas Neue, sans-serif" }}
-                      >
-                        Total Amount: ₱{purchase.totalAmount}
-                      </p>
-                      <p
-                        className="text-lg mb-2"
-                        style={{ fontFamily: "Bebas Neue, sans-serif" }}
-                      >
-                        Date: {purchase.date}
-                      </p>
-                      <div className="mt-4">
-                        <QRCode value={purchase.qrCodeData} />
-                      </div>
-                      <div className="mt-4">
-                        <p
-                          className="text-sm"
-                          style={{ fontFamily: "Bebas Neue, sans-serif" }}
-                        >
-                          City College of Angeles, Arayat Blvd., Barangay
-                          Pampang, Angeles City, Philippines
-                        </p>
-                      </div>
-                    </div>
+        {/* Purchase History Section Below Form */}
+        {purchaseHistory.length > 0 && (
+          <div className="mt-12">
+            <h2
+              className="text-3xl md:text-4xl font-extrabold mb-5"
+              style={{ fontFamily: "Bebas Neue, sans-serif" }}
+            >
+              Purchase History
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {purchaseHistory.map((purchase, index) => (
+                <div
+                  key={index}
+                  className="border rounded-2xl pb-4 flex flex-col items-center space-y-4 bg-slate-200 mx-auto"
+                >
+                  <div className="w-full">
+                    <img
+                      src={purchase.eventPosterURL || PosterPlaceholder}
+                      alt="Event Poster"
+                      className="rounded-t-2xl mb-4 object-cover h-48 w-full"
+                    />
                   </div>
-                ))}
-              </div>
+                  <div className="text-center">
+                    <h3
+                      className="text-3xl font-bold mb-2 text-black"
+                      style={{ fontFamily: "Bebas Neue, sans-serif" }}
+                    >
+                      {purchase.eventName}
+                    </h3>
+                    <h4
+                      className="text-2xl font-semibold mb-2 text-black"
+                      style={{ fontFamily: "Bebas Neue, sans-serif" }}
+                    >
+                      {purchase.ticketType}
+                    </h4>
+                  </div>
+                  <div className="mt-4">
+                    <QRCode value={purchase.qrCodeData} size={200} />
+                  </div>
+                  <div className="text-center">
+                    <p
+                      className="text-lg mb-1 text-black"
+                      style={{ fontFamily: "Bebas Neue, sans-serif" }}
+                    >
+                      Quantity: {purchase.quantity}
+                    </p>
+                    <p
+                      className="text-lg mb-1 text-black"
+                      style={{ fontFamily: "Bebas Neue, sans-serif" }}
+                    >
+                      Total Amount: ₱{purchase.totalAmount}
+                    </p>
+                    <p
+                      className="text-lg mb-1 text-black"
+                      style={{ fontFamily: "Bebas Neue, sans-serif" }}
+                    >
+                      Date: {purchase.date}
+                    </p>
+                  </div>
+
+                  <div className="mt-4">
+                    <p
+                      className="text-sm text-center text-black mx-5 my-2"
+                      style={{ fontFamily: "Bebas Neue, sans-serif" }}
+                    >
+                      City College of Angeles, Arayat Blvd., Barangay Pampang,
+                      Angeles City, Philippines
+                    </p>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         )}
