@@ -70,29 +70,51 @@ const CustomerHomePage = () => {
                       alt={event.name}
                       className="rounded-lg mb-4 w-full h-60 object-cover"
                     />
-                    <h2
-                      className="text-2xl font-extrabold text-violet-500"
-                      style={{ fontFamily: "Bebas Neue, sans-serif" }}
-                    >
-                      {event.name}
-                    </h2>
+                    <div className="flex items-center mb-2">
+                      <h2
+                        className="text-2xl font-extrabold text-violet-500 mr-4"
+                        style={{ fontFamily: "Bebas Neue, sans-serif" }}
+                      >
+                        {event.name}
+                      </h2>
+                      <h3
+                        className="text-xl text-white"
+                        style={{ fontFamily: "Bebas Neue, sans-serif" }}
+                      >
+                        {event.eventStartDate}
+                      </h3>
+                    </div>
                     <p
                       className="text-white"
                       style={{ fontFamily: "Bebas Neue, sans-serif" }}
                     >
+                      Registration Start Date:{" "}
                       {new Date(event.startDate).toLocaleDateString()}
                     </p>
                     <p
                       className="text-white"
                       style={{ fontFamily: "Bebas Neue, sans-serif" }}
                     >
-                      {formatTime(event.startTime)}
+                      Registration End Date:{" "}
+                      {new Date(event.endDate).toLocaleDateString()}
                     </p>
                     <p
                       className="text-white"
                       style={{ fontFamily: "Bebas Neue, sans-serif" }}
                     >
-                      {event.venue}
+                      Event Start Time: {formatTime(event.startTime)}
+                    </p>
+                    <p
+                      className="text-white"
+                      style={{ fontFamily: "Bebas Neue, sans-serif" }}
+                    >
+                      Event End Time: {formatTime(event.endTime)}
+                    </p>
+                    <p
+                      className="text-white"
+                      style={{ fontFamily: "Bebas Neue, sans-serif" }}
+                    >
+                      Venue: {event.venue}
                     </p>
                     <div
                       className={`bg-neutral-700 p-4 rounded-lg shadow-lg mt-5 transition-all duration-500 ease-in-out ${

@@ -16,7 +16,8 @@ const BuyTicketPage = () => {
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [ticketOptions, setTicketOptions] = useState([]);
   const [selectedTicketType, setSelectedTicketType] = useState("");
-  const [fullName, setFullName] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [quantity, setQuantity] = useState(1);
@@ -91,7 +92,8 @@ const BuyTicketPage = () => {
     e.preventDefault();
 
     const qrCodeData = JSON.stringify({
-      fullName,
+      firstName,
+      lastName,
       email,
       phoneNumber,
       ticketType: selectedTicketType,
@@ -102,7 +104,8 @@ const BuyTicketPage = () => {
     });
 
     const newPurchase = {
-      fullName,
+      firstName,
+      lastName,
       email,
       phoneNumber,
       ticketType: selectedTicketType,
@@ -118,7 +121,8 @@ const BuyTicketPage = () => {
     setPurchaseHistory([...purchaseHistory, newPurchase]);
 
     // Reset form fields after purchase
-    setFullName("");
+    setFirstName("");
+    setLastName("");
     setEmail("");
     setPhoneNumber("");
     setQuantity(1);
@@ -153,7 +157,7 @@ const BuyTicketPage = () => {
     dots: true,
     infinite: true,
     speed: 500,
-    slidesToShow: events.length === 1 ? 1 : 3,
+    slidesToShow: events.length,
     slidesToScroll: 1,
     arrows: true,
   };
@@ -243,12 +247,27 @@ const BuyTicketPage = () => {
                     className="block text-lg font-medium mb-1"
                     style={{ fontFamily: "Bebas Neue, sans-serif" }}
                   >
-                    Full Name
+                    First Name
                   </label>
                   <input
                     type="text"
-                    value={fullName}
-                    onChange={(e) => setFullName(e.target.value)}
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-black"
+                    required
+                  />
+                </div>
+                <div>
+                  <label
+                    className="block text-lg font-medium mb-1"
+                    style={{ fontFamily: "Bebas Neue, sans-serif" }}
+                  >
+                    Last Name
+                  </label>
+                  <input
+                    type="text"
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-black"
                     required
                   />
@@ -308,6 +327,17 @@ const BuyTicketPage = () => {
                       </option>
                     )}
                   </select>
+                  {ticketOptions.length > 0 && (
+                    <p
+                      className="text-sm text-gray-500 mt-1"
+                      style={{ fontFamily: "Bebas Neue, sans-serif" }}
+                    >
+                      Available Quantity:{" "}
+                      {ticketOptions.find(
+                        (ticket) => ticket.type === selectedTicketType
+                      )?.quantity || 0}
+                    </p>
+                  )}
                 </div>
                 <div>
                   <label
