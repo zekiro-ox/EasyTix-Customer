@@ -37,15 +37,17 @@ const CustomerHomePage = () => {
 
   return (
     <div className="min-h-screen text-white">
-      <Navbar />
+      <div className="sticky top-0 z-50">
+        <Navbar />
+      </div>
       <div className="relative">
         {/* Background Image */}
         <div
-          className="absolute inset-0 bg-cover bg-center"
+          className="fixed inset-0 bg-cover bg-center"
           style={{ backgroundImage: `url(${BackgroundImage})` }}
         />
         {/* Backdrop with Blur Effect */}
-        <div className="absolute inset-0 bg-gray-900 bg-opacity-50 backdrop-blur-sm" />
+        <div className="fixed inset-0 bg-gray-900 bg-opacity-50 backdrop-blur-sm" />
         <div className="relative z-10">
           <div className="bg-neutral-900 py-12 px-6 md:mx-20 lg:mx-60">
             {/* Added margins */}

@@ -32,7 +32,9 @@ const ContactUsPage = () => {
 
   return (
     <div className="bg-neutral-900 min-h-screen text-white">
-      <Navbar />
+      <div className="sticky top-0 z-50">
+        <Navbar />
+      </div>
       <div className="container mx-auto p-4 sm:p-10 bg-neutral-800 rounded-lg shadow-lg mt-12">
         <h2
           className="text-3xl font-bold mb-4 text-center text-violet-500"

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { getFirestore, collection, getDocs } from "firebase/firestore";
+import { getStorage, ref, getDownloadURL } from "firebase/storage";
 import Navbar from "./Navbar";
 import QRCode from "qrcode.react";
 import Slider from "react-slick";
@@ -7,6 +8,8 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import PosterPlaceholder from "./assets/SEATMAP.png";
 import QRCodeStyling from "qr-code-styling";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
 
 const BuyTicketPage = () => {
   const [events, setEvents] = useState([]);
@@ -19,6 +22,7 @@ const BuyTicketPage = () => {
   const [quantity, setQuantity] = useState(1);
   const [totalAmount, setTotalAmount] = useState(0);
   const [purchaseHistory, setPurchaseHistory] = useState([]);
+  const [imageUrls, setImageUrls] = useState({});
 
   // Fetch events from Firestore
   useEffect(() => {
@@ -31,6 +35,22 @@ const BuyTicketPage = () => {
         ...doc.data(),
       }));
       setEvents(eventsList);
+
+      const storage = getStorage();
+      eventsList.forEach((event) => {
+        const imageRef = ref(storage, event.eventPosterURL);
+        getDownloadURL(imageRef)
+          .then((url) => {
+            setImageUrls((prevImageUrls) => ({
+              ...prevImageUrls,
+              [event.id]: url,
+            }));
+          })
+          .catch((error) => {
+            console.error(error);
+          });
+      });
+
       if (eventsList.length > 0) {
         setSelectedEvent(eventsList[0]);
         setTicketOptions(eventsList[0].tickets || []); // Use tickets from the selected event
@@ -90,6 +110,7 @@ const BuyTicketPage = () => {
       totalAmount,
       date: new Date().toLocaleDateString(),
       eventName: selectedEvent?.name,
+      eventId: selectedEvent?.id, // Store the event ID
       eventPosterURL: selectedEvent?.eventPosterURL, // Store the poster URL for the event
       qrCodeData,
     };
@@ -105,19 +126,43 @@ const BuyTicketPage = () => {
       ticketOptions.length > 0 ? ticketOptions[0].type : ""
     );
   };
+  const downloadTicket = (purchase, index) => {
+    const ticketContainer = document.querySelector(
+      `.ticket-container-${index}`
+    );
+
+    // Hide the download button
+    const downloadButton = ticketContainer.querySelector("button");
+    downloadButton.style.display = "none";
+
+    html2canvas(ticketContainer, {
+      useCORS: true,
+      scale: 2,
+    }).then((canvas) => {
+      const imgData = canvas.toDataURL("image/png");
+      const pdf = new jsPDF("p", "mm", "a4");
+      pdf.addImage(imgData, "PNG", 0, 0, 210, 297);
+      pdf.save(`ticket-${purchase.eventName}.pdf`);
+
+      // Show the download button again
+      downloadButton.style.display = "block";
+    });
+  };
 
   const sliderSettings = {
     dots: true,
     infinite: true,
     speed: 500,
-    slidesToShow: 3,
+    slidesToShow: events.length === 1 ? 1 : 3,
     slidesToScroll: 1,
     arrows: true,
   };
 
   return (
     <div className="bg-neutral-900 min-h-screen text-white">
-      <Navbar />
+      <div className="sticky top-0 z-50">
+        <Navbar />
+      </div>
       <div className="container mx-auto mt-8 p-4 md:p-10 bg-neutral-800 rounded-lg shadow-lg">
         <h2
           className="text-3xl md:text-4xl font-extrabold mb-6"
@@ -126,33 +171,58 @@ const BuyTicketPage = () => {
           Choose Your Event
         </h2>
 
-        {events.length > 0 && (
-          <Slider {...sliderSettings} className="mb-8">
-            {events.map((event) => (
+        {events.length > 0 &&
+          (events.length === 1 ? (
+            <div className="mb-8">
               <div
-                key={event.id}
-                onClick={() => setSelectedEvent(event)}
+                key={events[0].id}
+                onClick={() => setSelectedEvent(events[0])}
                 className={`p-2 cursor-pointer ${
-                  selectedEvent?.id === event.id
-                    ? "border-4 border-violet-500"
+                  selectedEvent?.id === events[0].id
+                    ? "border-4 border-violet-500 rounded-lg"
                     : ""
                 }`}
               >
                 <img
-                  src={event.eventPosterURL || PosterPlaceholder}
-                  alt={event.name}
-                  className="rounded-lg mb-2 object-cover h-40 w-full"
+                  src={events[0].eventPosterURL || PosterPlaceholder}
+                  alt={events[0].name}
+                  className="rounded-lg mb-2 object-cover h-60 w-full"
                 />
                 <p
                   className="text-center text-lg font-bold"
                   style={{ fontFamily: "Bebas Neue, sans-serif" }}
                 >
-                  {event.name}
+                  {events[0].name}
                 </p>
               </div>
-            ))}
-          </Slider>
-        )}
+            </div>
+          ) : (
+            <Slider {...sliderSettings} className="mb-8">
+              {events.map((event) => (
+                <div
+                  key={event.id}
+                  onClick={() => setSelectedEvent(event)}
+                  className={`p-2 cursor-pointer ${
+                    selectedEvent?.id === event.id
+                      ? "border-4 border-violet-500"
+                      : ""
+                  }`}
+                >
+                  <img
+                    src={event.eventPosterURL || PosterPlaceholder}
+                    alt={event.name}
+                    className="rounded-lg mb-2 object-cover h-40 w-full"
+                  />
+                  <p
+                    className="text-center text-lg font-bold"
+                    style={{ fontFamily: "Bebas Neue, sans-serif" }}
+                  >
+                    {event.name}
+                  </p>
+                </div>
+              ))}
+            </Slider>
+          ))}
 
         {selectedEvent && (
           <div className="mt-8 flex flex-col md:flex-row justify-between">
@@ -293,13 +363,13 @@ const BuyTicketPage = () => {
               {purchaseHistory.map((purchase, index) => (
                 <div
                   key={index}
-                  className="border rounded-2xl pb-4 flex flex-col items-center space-y-4 bg-slate-200 mx-auto"
+                  className={`border rounded-2xl pb-4 flex flex-col items-center space-y-4 bg-slate-200 mx-auto ticket-container-${index}`}
                 >
                   <div className="w-full">
                     <img
-                      src={purchase.eventPosterURL || PosterPlaceholder}
-                      alt="Event Poster"
-                      className="rounded-t-2xl mb-4 object-cover h-48 w-full"
+                      src={imageUrls[purchase.eventId] || PosterPlaceholder}
+                      alt={purchase.eventName}
+                      className="rounded-t-2xl mb-2 object-cover h-60 w-full"
                     />
                   </div>
                   <div className="text-center">
@@ -339,7 +409,6 @@ const BuyTicketPage = () => {
                       Date: {purchase.date}
                     </p>
                   </div>
-
                   <div className="mt-4">
                     <p
                       className="text-sm text-center text-black mx-5 my-2"
@@ -349,6 +418,12 @@ const BuyTicketPage = () => {
                       Angeles City, Philippines
                     </p>
                   </div>
+                  <button
+                    className="bg-violet-500 hover:bg-violet-600 text-white font-bold py-2 px-4 rounded"
+                    onClick={() => downloadTicket(purchase, index)}
+                  >
+                    Download Ticket
+                  </button>
                 </div>
               ))}
             </div>
