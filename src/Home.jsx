@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { getFirestore, collection, getDocs } from "firebase/firestore";
 import PosterPlaceholder from "./assets/Manawari.jpg";
 import Navbar from "./Navbar";
-import BackgroundImage from "./assets/school.jpg"; // Adjust this path to your background image
+import BackgroundImage from "./assets/Background.jpg"; // Adjust this path to your background image
 
 const CustomerHomePage = () => {
   const [events, setEvents] = useState([]);
@@ -47,9 +47,9 @@ const CustomerHomePage = () => {
           style={{ backgroundImage: `url(${BackgroundImage})` }}
         />
         {/* Backdrop with Blur Effect */}
-        <div className="fixed inset-0 bg-gray-900 bg-opacity-50 backdrop-blur-sm" />
+        <div className="fixed inset-0 bg-gray-900 bg-opacity-25 backdrop-blur-sm" />
         <div className="relative z-10">
-          <div className="bg-neutral-900 py-12 px-6 md:mx-20 lg:mx-60">
+          <div className="bg-neutral-900 py-12 px-6 md:mx-20 lg:mx-60 bg-opacity-75 backdrop-blur-md">
             {/* Added margins */}
             <div className="container mx-auto flex justify-center">
               <div className="grid grid-cols-1 gap-4">

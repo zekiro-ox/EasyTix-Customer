@@ -10,6 +10,7 @@ import PosterPlaceholder from "./assets/SEATMAP.png";
 import QRCodeStyling from "qr-code-styling";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
+import TicketPoster from "./assets/Ticket.png";
 
 const BuyTicketPage = () => {
   const [events, setEvents] = useState([]);
@@ -144,8 +145,8 @@ const BuyTicketPage = () => {
       scale: 2,
     }).then((canvas) => {
       const imgData = canvas.toDataURL("image/png");
-      const pdf = new jsPDF("p", "mm", "a4");
-      pdf.addImage(imgData, "PNG", 0, 0, 210, 297);
+      const pdf = new jsPDF("p", "mm", [65, 143]); // Set the paper size to 5.63" x 1.97" (143mm x 50mm)
+      pdf.addImage(imgData, "PNG", 0, 0, 65, 143); // Set the image size to the paper size
       pdf.save(`ticket-${purchase.eventName}.pdf`);
 
       // Show the download button again
@@ -393,13 +394,13 @@ const BuyTicketPage = () => {
               {purchaseHistory.map((purchase, index) => (
                 <div
                   key={index}
-                  className={`border rounded-2xl pb-4 flex flex-col items-center space-y-4 bg-slate-200 mx-auto ticket-container-${index}`}
+                  className={`border pb-4 flex flex-col items-center space-y-4 bg-slate-100 mx-auto ticket-container-${index}`}
                 >
                   <div className="w-full">
                     <img
-                      src={imageUrls[purchase.eventId] || PosterPlaceholder}
+                      src={TicketPoster}
                       alt={purchase.eventName}
-                      className="rounded-t-2xl mb-2 object-cover h-60 w-full"
+                      className=" mb-2 object-cover h-60 w-full"
                     />
                   </div>
                   <div className="text-center">
