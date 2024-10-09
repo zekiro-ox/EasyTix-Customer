@@ -1,6 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { getFirestore, collection, getDocs } from "firebase/firestore";
+import {
+  getFirestore,
+  collection,
+  getDocs,
+  doc,
+  setDoc,
+} from "firebase/firestore";
 import { getStorage, ref, getDownloadURL } from "firebase/storage";
+import { getAuth } from "firebase/auth";
 import Navbar from "./Navbar";
 import QRCode from "qrcode.react";
 import Slider from "react-slick";
@@ -89,7 +96,7 @@ const BuyTicketPage = () => {
     }
   }, [selectedTicketType, quantity, ticketOptions]);
 
-  const handlePurchase = (e) => {
+  const handlePurchase = async (e) => {
     e.preventDefault();
 
     const qrCodeData = JSON.stringify({
@@ -119,7 +126,16 @@ const BuyTicketPage = () => {
       qrCodeData,
     };
 
-    setPurchaseHistory([...purchaseHistory, newPurchase]);
+    setPurchaseHistory([newPurchase, ...purchaseHistory]);
+    // Get the current user's UID
+    const auth = getAuth();
+    const userId = auth.currentUser.uid;
+
+    // Add the purchase data to the "customers" subcollection of the event
+    const db = getFirestore();
+    const eventRef = doc(db, "events", selectedEvent.id);
+    const customerRef = collection(eventRef, "customers");
+    await setDoc(doc(customerRef, userId), newPurchase);
 
     // Reset form fields after purchase
     setFirstName("");
@@ -131,6 +147,7 @@ const BuyTicketPage = () => {
       ticketOptions.length > 0 ? ticketOptions[0].type : ""
     );
   };
+
   const downloadTicket = (purchase, index) => {
     const ticketContainer = document.querySelector(
       `.ticket-container-${index}`
