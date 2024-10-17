@@ -14,7 +14,6 @@ import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import PosterPlaceholder from "./assets/SEATMAP.png";
-import QRCodeStyling from "qr-code-styling";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import TicketPoster from "./assets/Ticket.png";
@@ -95,6 +94,14 @@ const BuyTicketPage = () => {
       setTotalAmount(price * quantity);
     }
   }, [selectedTicketType, quantity, ticketOptions]);
+
+  useEffect(() => {
+    const auth = getAuth();
+    const user = auth.currentUser;
+    if (user) {
+      setEmail(user.email); // Set the email state to the current user's email
+    }
+  }, []);
 
   const handlePurchase = async (e) => {
     e.preventDefault();
@@ -313,9 +320,13 @@ const BuyTicketPage = () => {
                     Phone Number
                   </label>
                   <input
-                    type="text"
+                    type="tel"
                     value={phoneNumber}
-                    onChange={(e) => setPhoneNumber(e.target.value)}
+                    onChange={(e) =>
+                      setPhoneNumber(e.target.value.replace(/[^0-9]/g, ""))
+                    }
+                    pattern="[0-9]{11}"
+                    maxLength={11}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-black"
                     required
                   />
