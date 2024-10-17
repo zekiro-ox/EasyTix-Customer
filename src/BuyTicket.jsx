@@ -99,6 +99,7 @@ const BuyTicketPage = () => {
   const handlePurchase = async (e) => {
     e.preventDefault();
 
+    // Create QR code data with the specified fields
     const qrCodeData = JSON.stringify({
       firstName,
       lastName,
@@ -106,11 +107,9 @@ const BuyTicketPage = () => {
       phoneNumber,
       ticketType: selectedTicketType,
       quantity,
-      totalAmount,
-      eventName: selectedEvent?.name,
-      date: new Date().toLocaleDateString(),
     });
 
+    // Create the new purchase object without qrCodeData
     const newPurchase = {
       firstName,
       lastName,
@@ -122,11 +121,12 @@ const BuyTicketPage = () => {
       date: new Date().toLocaleDateString(),
       eventName: selectedEvent?.name,
       eventId: selectedEvent?.id, // Store the event ID
-      eventPosterURL: selectedEvent?.eventPosterURL, // Store the poster URL for the event
-      qrCodeData,
+      eventPosterURL: selectedEvent?.eventPosterURL,
+      qrCodeData, // Store the poster URL for the event
     };
 
     setPurchaseHistory([newPurchase, ...purchaseHistory]);
+
     // Get the current user's UID
     const auth = getAuth();
     const userId = auth.currentUser.uid;
