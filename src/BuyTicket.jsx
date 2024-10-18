@@ -5,6 +5,9 @@ import {
   getDocs,
   doc,
   setDoc,
+  getDoc,
+  query, // Import query
+  where,
 } from "firebase/firestore";
 import { getStorage, ref, getDownloadURL } from "firebase/storage";
 import { getAuth } from "firebase/auth";
@@ -17,6 +20,7 @@ import PosterPlaceholder from "./assets/SEATMAP.png";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import TicketPoster from "./assets/Ticket.png";
+import { v4 as uuidv4 } from "uuid";
 
 const BuyTicketPage = () => {
   const [events, setEvents] = useState([]);
@@ -70,6 +74,55 @@ const BuyTicketPage = () => {
     fetchEvents();
   }, []);
 
+  useEffect(() => {
+    const fetchUserData = async () => {
+      const auth = getAuth();
+      const user = auth.currentUser;
+
+      if (user) {
+        const db = getFirestore();
+        const userDoc = doc(db, "users", user.uid); // Reference to the user's document
+        const docSnap = await getDoc(userDoc); // Fetch the document
+
+        if (docSnap.exists()) {
+          const userData = docSnap.data();
+          setFirstName(userData.firstName || "");
+          setLastName(userData.lastName || "");
+          setEmail(user.email); // Set the email from Firebase Auth
+          setPhoneNumber(userData.phoneNumber || ""); // Set the phone number from Firestore
+        }
+
+        // Check if selectedEvent is not null before fetching purchase history
+        if (selectedEvent) {
+          const purchasesCollection = collection(
+            db,
+            "events",
+            selectedEvent.id,
+            "customers"
+          );
+          const purchasesQuery = query(
+            purchasesCollection,
+            where("uid", "==", user.uid)
+          );
+          const purchasesSnapshot = await getDocs(purchasesQuery);
+          const purchasesList = purchasesSnapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          }));
+
+          purchasesList.sort(
+            (a, b) =>
+              new Date(b.purchaseTimestamp.toDate()).getTime() -
+              new Date(a.purchaseTimestamp.toDate()).getTime()
+          );
+          setPurchaseHistory(purchasesList);
+        }
+      }
+    };
+
+    fetchUserData();
+  }, [selectedEvent]);
+
   // Update ticket options when the selected event changes
   useEffect(() => {
     if (selectedEvent) {
@@ -102,11 +155,22 @@ const BuyTicketPage = () => {
       setEmail(user.email); // Set the email state to the current user's email
     }
   }, []);
-
   const handlePurchase = async (e) => {
     e.preventDefault();
 
-    // Create QR code data with the specified fields
+    // Get the current user's UID
+    const auth = getAuth();
+    const userId = auth.currentUser.uid; // Move this line up
+
+    // Generate a unique ticket ID based on type, price, and a random UUID
+    const selectedTicket = ticketOptions.find(
+      (ticket) => ticket.type === selectedTicketType
+    );
+    const ticketPrice = selectedTicket ? selectedTicket.price : 0;
+
+    // Create a composite ticket ID
+    const ticketID = `${selectedTicketType}-${ticketPrice}-${uuidv4()}`;
+
     const qrCodeData = JSON.stringify({
       firstName,
       lastName,
@@ -114,10 +178,12 @@ const BuyTicketPage = () => {
       phoneNumber,
       ticketType: selectedTicketType,
       quantity,
+      ticketID, // Keep the ticket ID in the QR code data
     });
 
-    // Create the new purchase object without qrCodeData
+    // Create the new purchase object
     const newPurchase = {
+      uid: userId, // Store the user's UID instead of the ticket ID
       firstName,
       lastName,
       email,
@@ -129,32 +195,64 @@ const BuyTicketPage = () => {
       eventName: selectedEvent?.name,
       eventId: selectedEvent?.id, // Store the event ID
       eventPosterURL: selectedEvent?.eventPosterURL,
-      qrCodeData, // Store the poster URL for the event
+      qrCodeData,
+      purchaseTimestamp: new Date(), // Include timestamp with both date and time
     };
 
-    setPurchaseHistory([newPurchase, ...purchaseHistory]);
+    // Check if the ticket ID already exists for the same user
+    const ticketExists = purchaseHistory.some(
+      (purchase) =>
+        purchase.eventId === selectedEvent.id && purchase.ticketID === ticketID
+    );
 
-    // Get the current user's UID
-    const auth = getAuth();
-    const userId = auth.currentUser.uid;
-
-    // Add the purchase data to the "customers" subcollection of the event
+    // Save the purchase in Firestore using the ticket ID as the document ID
     const db = getFirestore();
     const eventRef = doc(db, "events", selectedEvent.id);
     const customerRef = collection(eventRef, "customers");
-    await setDoc(doc(customerRef, userId), newPurchase);
 
-    // Reset form fields after purchase
-    setFirstName("");
-    setLastName("");
-    setEmail("");
-    setPhoneNumber("");
-    setQuantity(1);
-    setSelectedTicketType(
-      ticketOptions.length > 0 ? ticketOptions[0].type : ""
-    );
+    // Use the ticket ID as the document ID for purchases
+    if (!ticketExists) {
+      // Save the new purchase
+      await setDoc(
+        doc(customerRef, ticketID), // Use ticketID as the document ID
+        {
+          ...newPurchase,
+        }
+      ); // No need for merge since we are creating a new document
+
+      // Update the purchase history state
+      setPurchaseHistory((prevHistory) => {
+        const newHistory = [newPurchase, ...prevHistory];
+        newHistory.sort(
+          (a, b) =>
+            new Date(b.purchaseTimestamp).getTime() -
+            new Date(a.purchaseTimestamp).getTime()
+        );
+        return newHistory;
+      });
+      const auth = getAuth();
+      const user = auth.currentUser;
+
+      if (user) {
+        const userDoc = doc(db, "users", user.uid);
+        const docSnap = await getDoc(userDoc);
+        if (docSnap.exists()) {
+          const userData = docSnap.data();
+          setFirstName(userData.firstName || "");
+          setLastName(userData.lastName || "");
+          setEmail(user.email);
+          setPhoneNumber(userData.phoneNumber || "");
+        }
+      }
+      setQuantity(1);
+      setSelectedTicketType(
+        ticketOptions.length > 0 ? ticketOptions[0].type : ""
+      );
+    } else {
+      // Optionally, alert the user that the ticket ID already exists
+      alert("You already purchased a ticket with this ID for this event.");
+    }
   };
-
   const downloadTicket = (purchase, index) => {
     const ticketContainer = document.querySelector(
       `.ticket-container-${index}`

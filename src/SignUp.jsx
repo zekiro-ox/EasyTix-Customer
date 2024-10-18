@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import Logo from "./assets/CompanyLogo.png";
 import { auth } from "./config/firebase"; // Import the Firebase auth object
 import { createUserWithEmailAndPassword } from "firebase/auth"; // Import Firebase auth methods
+import { getFirestore, doc, setDoc } from "firebase/firestore"; // Import Firestore functions
 
 const CustomerSignUpPage = () => {
   const [username, setUsername] = useState("");
@@ -30,6 +31,15 @@ const CustomerSignUpPage = () => {
       );
       // Signed in
       const user = userCredential.user;
+
+      // Save username to Firestore
+      const db = getFirestore();
+      await setDoc(doc(db, "users", user.uid), {
+        username: username,
+        email: email,
+        createdAt: new Date().toISOString(), // Optional: Save the creation date
+      });
+
       console.log("Sign-up successful", user);
       navigate("/login"); // Redirect to login page after successful signup
     } catch (error) {

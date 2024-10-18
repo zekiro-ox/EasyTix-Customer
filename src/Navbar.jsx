@@ -1,12 +1,31 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { MenuIcon, XIcon, UserCircleIcon } from "@heroicons/react/outline";
 import Logo from "./assets/CompanyLogo.png";
+import { getFirestore, doc, getDoc } from "firebase/firestore";
+import { getAuth } from "firebase/auth";
 
 const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = React.useState(false);
-  const location = useLocation(); // Get the current location
+  const [profilePicture, setProfilePicture] = useState(null); // State for profile picture
+  const location = useLocation();
+  const db = getFirestore();
+  const auth = getAuth(); // Initialize Firebase Auth
+
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      const user = auth.currentUser; // Get the current user
+      if (user) {
+        const userDoc = await getDoc(doc(db, "users", user.uid)); // Use UID to fetch user data
+        if (userDoc.exists()) {
+          setProfilePicture(userDoc.data().profilePicture); // Set the profile picture URL
+        }
+      }
+    };
+
+    fetchUserProfile();
+  }, [db, auth]);
 
   const toggleProfileMenu = () => {
     setIsProfileMenuOpen(!isProfileMenuOpen);
@@ -96,7 +115,15 @@ const Navbar = () => {
               aria-haspopup="true"
             >
               <span className="sr-only">Open user menu</span>
-              <UserCircleIcon className="h-6 w-6" aria-hidden="true" />
+              {profilePicture ? (
+                <img
+                  src={profilePicture}
+                  alt="Profile"
+                  className="h-6 w-6 rounded-full"
+                />
+              ) : (
+                <UserCircleIcon className="h-6 w-6" aria-hidden="true" />
+              )}
             </button>
             {/* Dropdown menu, show/hide based on menu state */}
             <div
@@ -109,6 +136,15 @@ const Navbar = () => {
               tabIndex="-1"
             >
               {/* Profile dropdown items */}
+              <Link
+                to="/profile"
+                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                style={{ fontFamily: "Bebas Neue, sans-serif" }}
+                role="menuitem"
+                tabIndex="-1"
+              >
+                Profile
+              </Link>
               <Link
                 to="/logout"
                 className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
