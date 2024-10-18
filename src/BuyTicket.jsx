@@ -172,13 +172,13 @@ const BuyTicketPage = () => {
     const ticketID = `${selectedTicketType}-${ticketPrice}-${uuidv4()}`;
 
     const qrCodeData = JSON.stringify({
+      ticketID,
       firstName,
       lastName,
       email,
       phoneNumber,
       ticketType: selectedTicketType,
-      quantity,
-      ticketID, // Keep the ticket ID in the QR code data
+      quantity, // Keep the ticket ID in the QR code data
     });
 
     // Create the new purchase object
