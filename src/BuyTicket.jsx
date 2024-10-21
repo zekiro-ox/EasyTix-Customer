@@ -6,7 +6,7 @@ import {
   doc,
   setDoc,
   getDoc,
-  query, // Import query
+  query,
   where,
 } from "firebase/firestore";
 import { getStorage, ref, getDownloadURL } from "firebase/storage";
@@ -35,6 +35,7 @@ const BuyTicketPage = () => {
   const [totalAmount, setTotalAmount] = useState(0);
   const [purchaseHistory, setPurchaseHistory] = useState([]);
   const [imageUrls, setImageUrls] = useState({});
+  const [paymentStatus, setPaymentStatus] = useState(null);
 
   // Fetch events from Firestore
   useEffect(() => {
@@ -143,7 +144,7 @@ const BuyTicketPage = () => {
       const selectedTicket = ticketOptions.find(
         (ticket) => ticket.type === selectedTicketType
       );
-      const price = selectedTicket ? parseFloat(selectedTicket.price) : 0;
+      const price = selectedTicket ? selectedTicket.price : 0;
       setTotalAmount(price * quantity);
     }
   }, [selectedTicketType, quantity, ticketOptions]);
@@ -155,9 +156,14 @@ const BuyTicketPage = () => {
       setEmail(user.email); // Set the email state to the current user's email
     }
   }, []);
-  const handlePurchase = async (e) => {
-    e.preventDefault();
 
+  const handlePaymentSuccess = async (details) => {
+    // Display payment success message
+    setPaymentStatus("Payment successful!");
+    alert("Payment successful!"); // Popup message
+  };
+
+  const handlePurchase = async (details) => {
     // Get the current user's UID
     const auth = getAuth();
     const userId = auth.currentUser.uid; // Move this line up
@@ -234,7 +240,7 @@ const BuyTicketPage = () => {
       const user = auth.currentUser;
 
       if (user) {
-        const userDoc = doc(db, "users", user.uid);
+        const userDoc = doc(db, " users", user.uid);
         const docSnap = await getDoc(userDoc);
         if (docSnap.exists()) {
           const userData = docSnap.data();
@@ -253,6 +259,52 @@ const BuyTicketPage = () => {
       alert("You already purchased a ticket with this ID for this event.");
     }
   };
+
+  useEffect(() => {
+    const paypal = window.paypal;
+
+    const paypalButtonContainer = document.getElementById(
+      "paypal-button-container"
+    );
+    if (paypalButtonContainer) {
+      paypalButtonContainer.innerHTML = ""; // Clear existing buttons
+
+      if (paypal && totalAmount > 0) {
+        paypal
+          .Buttons({
+            createOrder: (data, actions) => {
+              return actions.order.create({
+                purchase_units: [
+                  {
+                    amount: {
+                      currency_code: "PHP",
+                      value: totalAmount.toString(), // Convert to string
+                    },
+                  },
+                ],
+              });
+            },
+            onApprove: async (data, actions) => {
+              const details = await actions.order.capture();
+              await handlePaymentSuccess(details); // Call the success handler
+
+              // Call handlePurchase after successful payment
+              await handlePurchase(details); // Pass the payment details if needed
+            },
+            onError: (error) => {
+              handlePaymentError(error);
+            },
+          })
+          .render(paypalButtonContainer); // Render the button in the cleared container
+      }
+    }
+  }, [totalAmount, ticketOptions]); // Ensure dependencies are correct // Also include ticketOptions in the dependency array
+
+  const handlePaymentError = (error) => {
+    // Handle payment error
+    setPaymentStatus("Payment failed. Please try again.");
+  };
+
   const downloadTicket = (purchase, index) => {
     const ticketContainer = document.querySelector(
       `.ticket-container-${index}`
@@ -495,13 +547,7 @@ const BuyTicketPage = () => {
                     Total Amount: ₱{totalAmount}
                   </p>
                 </div>
-                <button
-                  type="submit"
-                  className="w-full px-4 py-2 bg-violet-500 hover:bg-violet-600 text-white font-bold rounded-md"
-                  style={{ fontFamily: "Bebas Neue, sans-serif" }}
-                >
-                  Purchase
-                </button>
+                <div id="paypal-button-container"></div>
               </form>
             </div>
           </div>
