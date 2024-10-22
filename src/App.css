@@ -1,0 +1,30 @@
+/* Navbar styles */
+.navbar {
+    position: sticky; /* Ensure the navbar sticks to the top */
+    top: 0;
+    z-index: 50; /* Keep it above other elements */
+    background-color: #1a1a1a; /* Match your design */
+    height: 60px; /* Define a fixed height for the navbar */
+}
+
+/* PayPal button container styles */
+#paypal-button-container {
+    margin-top: 60px; /* Adjusted based on your navbar height */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+.container {
+    padding-top: 60px; /* Adjust based on your navbar height */
+}
+
+@media (max-width: 600px) {
+    #paypal-button-container {
+        max-width: 100%; /* Allow full width on smaller screens */
+        margin-top: 60px; /* Increase margin for smaller screens if necessary */
+    }
+}

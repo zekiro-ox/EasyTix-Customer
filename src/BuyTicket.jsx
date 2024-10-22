@@ -21,6 +21,7 @@ import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import TicketPoster from "./assets/Ticket.png";
 import { v4 as uuidv4 } from "uuid";
+import { ToastContainer, toast } from "react-toastify";
 
 const BuyTicketPage = () => {
   const [events, setEvents] = useState([]);
@@ -160,7 +161,7 @@ const BuyTicketPage = () => {
   const handlePaymentSuccess = async (details) => {
     // Display payment success message
     setPaymentStatus("Payment successful!");
-    alert("Payment successful!"); // Popup message
+    toast.success("Payment successful!"); // Popup message
   };
 
   const handlePurchase = async (details) => {
@@ -286,7 +287,8 @@ const BuyTicketPage = () => {
             },
             onApprove: async (data, actions) => {
               const details = await actions.order.capture();
-              await handlePaymentSuccess(details); // Call the success handler
+              await handlePaymentSuccess(details);
+              // Call the success handler
 
               // Call handlePurchase after successful payment
               await handlePurchase(details); // Pass the payment details if needed
@@ -339,7 +341,8 @@ const BuyTicketPage = () => {
 
   return (
     <div className="bg-neutral-900 min-h-screen text-white">
-      <div className="sticky top-0 z-50">
+      <ToastContainer /> {/* Add ToastContainer to your component */}
+      <div className="sticky top-0 z-50 navbar">
         <Navbar />
       </div>
       <div className="container mx-auto mt-8 p-4 md:p-10 bg-neutral-800 rounded-lg shadow-lg">
@@ -547,7 +550,7 @@ const BuyTicketPage = () => {
                     Total Amount: ₱{totalAmount}
                   </p>
                 </div>
-                <div id="paypal-button-container"></div>
+                <div id="paypal-button-container" className="my-4" />
               </form>
             </div>
           </div>
