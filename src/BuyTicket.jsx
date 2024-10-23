@@ -22,6 +22,7 @@ import jsPDF from "jspdf";
 import TicketPoster from "./assets/Ticket.png";
 import { v4 as uuidv4 } from "uuid";
 import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const BuyTicketPage = () => {
   const [events, setEvents] = useState([]);
@@ -160,8 +161,7 @@ const BuyTicketPage = () => {
 
   const handlePaymentSuccess = async (details) => {
     // Display payment success message
-    setPaymentStatus("Payment successful!");
-    toast.success("Payment successful!"); // Popup message
+    setPaymentStatus("Payment successful!"); // Popup message
   };
 
   const handlePurchase = async (details) => {
@@ -255,6 +255,7 @@ const BuyTicketPage = () => {
       setSelectedTicketType(
         ticketOptions.length > 0 ? ticketOptions[0].type : ""
       );
+      toast.success("Ticket Purchased");
     } else {
       // Optionally, alert the user that the ticket ID already exists
       alert("You already purchased a ticket with this ID for this event.");
