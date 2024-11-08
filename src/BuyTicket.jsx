@@ -24,11 +24,53 @@ import { v4 as uuidv4 } from "uuid";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
+// Modal Component for Seat Selection
+// Modal Component for Seat Selection
+const SeatSelectionModal = ({ isOpen, onClose, renderSeats }) => {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+      <div className="bg-neutral-900 p-5 rounded-lg max-w-2xl w-full mx-4">
+        <h2 className="text-xl font-bold mb-4 text-center">
+          Select Your Seats
+        </h2>
+        <div className="overflow-y-auto max-h-60">{renderSeats()}</div>
+
+        {/* Legend Section */}
+        <div className="mt-4">
+          <div className="flex justify-center mb-2">
+            <div className="flex items-center mr-4">
+              <div className="w-4 h-4 bg-red-500 border border-black rounded-full mr-1"></div>
+              <span>Occupied</span>
+            </div>
+            <div className="flex items-center mr-4">
+              <div className="w-4 h-4 bg-green-500 border border-black rounded-full mr-1"></div>
+              <span>Available</span>
+            </div>
+            <div className="flex items-center">
+              <div className="w-4 h-4 bg-gray-400 border border-black rounded-full mr-1"></div>
+              <span>Unoccupied</span>
+            </div>
+          </div>
+        </div>
+
+        <button
+          className="mt-4 bg-violet-500 hover:bg-violet-600 text-white font-bold py-2 px-4 rounded w-full"
+          onClick={onClose}
+        >
+          Close
+        </button>
+      </div>
+    </div>
+  );
+};
+
 const BuyTicketPage = () => {
   const [events, setEvents] = useState([]);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [ticketOptions, setTicketOptions] = useState([]);
-  const [selectedTicketType, setSelectedTicketType] = useState("");
+  const [selectedTicketType, setSelectedTicketType] = useState("None");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
@@ -38,6 +80,9 @@ const BuyTicketPage = () => {
   const [purchaseHistory, setPurchaseHistory] = useState([]);
   const [imageUrls, setImageUrls] = useState({});
   const [paymentStatus, setPaymentStatus] = useState(null);
+  const [selectedSeats, setSelectedSeats] = useState([]);
+  const [seats, setSeats] = useState([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Fetch events from Firestore
   useEffect(() => {
@@ -68,7 +113,10 @@ const BuyTicketPage = () => {
 
       if (eventsList.length > 0) {
         setSelectedEvent(eventsList[0]);
-        setTicketOptions(eventsList[0].tickets || []); // Use tickets from the selected event
+        setTicketOptions([
+          { type: "None.", price: 0 },
+          ...(eventsList[0].tickets || []),
+        ]); // Add "None" option
         if (eventsList[0].tickets.length > 0)
           setSelectedTicketType(eventsList[0].tickets[0].type); // Set default ticket type
       }
@@ -84,18 +132,17 @@ const BuyTicketPage = () => {
 
       if (user) {
         const db = getFirestore();
-        const userDoc = doc(db, "users", user.uid); // Reference to the user's document
-        const docSnap = await getDoc(userDoc); // Fetch the document
+        const userDoc = doc(db, "users", user.uid);
+        const docSnap = await getDoc(userDoc);
 
         if (docSnap.exists()) {
           const userData = docSnap.data();
           setFirstName(userData.firstName || "");
           setLastName(userData.lastName || "");
-          setEmail(user.email); // Set the email from Firebase Auth
-          setPhoneNumber(userData.phoneNumber || ""); // Set the phone number from Firestore
+          setEmail(user.email);
+          setPhoneNumber(userData.phoneNumber || "");
         }
 
-        // Check if selectedEvent is not null before fetching purchase history
         if (selectedEvent) {
           const purchasesCollection = collection(
             db,
@@ -126,21 +173,21 @@ const BuyTicketPage = () => {
     fetchUserData();
   }, [selectedEvent]);
 
-  // Update ticket options when the selected event changes
   useEffect(() => {
     if (selectedEvent) {
-      setTicketOptions(selectedEvent.tickets || []); // Set tickets from the selected event
+      setTicketOptions([
+        { type: "None", price: 0 },
+        ...(selectedEvent.tickets || []),
+      ]);
       if (selectedEvent.tickets.length > 0) {
-        setSelectedTicketType(selectedEvent.tickets[0].type); // Set default ticket type
-      } else {
-        setSelectedTicketType(""); // Reset if no tickets are available
+        setSelectedTicketType(selectedEvent.tickets[0].type);
+        fetchSeatingConfiguration(selectedEvent.tickets[0]);
       }
     } else {
-      setTicketOptions([]); // Reset ticket options when no event is selected
+      setTicketOptions([]);
     }
   }, [selectedEvent]);
 
-  // Update total amount whenever ticket type or quantity changes
   useEffect(() => {
     if (ticketOptions.length > 0) {
       const selectedTicket = ticketOptions.find(
@@ -151,13 +198,92 @@ const BuyTicketPage = () => {
     }
   }, [selectedTicketType, quantity, ticketOptions]);
 
-  useEffect(() => {
-    const auth = getAuth();
-    const user = auth.currentUser;
-    if (user) {
-      setEmail(user.email); // Set the email state to the current user's email
+  const handleTicketTypeChange = (e) => {
+    const ticketType = e.target.value;
+    setSelectedTicketType(ticketType);
+
+    if (ticketType !== "None") {
+      const selectedTicket = ticketOptions.find(
+        (ticket) => ticket.type === ticketType
+      );
+      if (selectedTicket) {
+        fetchSeatingConfiguration(selectedTicket); // Fetch seating configuration for the selected ticket type
+        setIsModalOpen(true); // Open modal if ticket type is not "None"
+      } else {
+        setIsModalOpen(false); // Close modal if "None" is selected
+      }
+    } else {
+      setIsModalOpen(false); // Close modal if "None" is selected
     }
-  }, []);
+  };
+
+  const fetchSeatingConfiguration = (ticket) => {
+    const columns = parseInt(ticket.column); // Get the number of columns from the ticket
+    const totalSeats = parseInt(ticket.quantity); // Use quantity as the total number of seats
+
+    // Get the occupied seats from the ticket
+    const occupiedSeats = ticket.occupied || 0; // Default to 0 if undefined
+
+    // Calculate the number of rows needed
+    const rows = Math.ceil(totalSeats / columns);
+
+    // Create the seats array
+    const seats = Array.from({ length: rows }, (_, rowIndex) => {
+      return Array.from({ length: columns }, (_, colIndex) => {
+        const seatIndex = rowIndex * columns + colIndex;
+
+        return {
+          isOccupied: seatIndex < occupiedSeats, // Mark as occupied if seatIndex is less than occupiedSeats
+          isAvailable:
+            seatIndex >= occupiedSeats && seatIndex < occupiedSeats + quantity, // Mark as available based on user's selected quantity
+        };
+      });
+    });
+
+    setSeats(seats);
+    updateSelectedSeats(seats); // Update the selected seats based on the initial configuration
+  };
+  const renderSeats = () => {
+    return seats.map((row, rowIndex) => (
+      <div key={rowIndex} className="flex justify-center mb-2">
+        {row.map((seat, colIndex) => (
+          <div
+            key={colIndex}
+            className={`seat ${seat.isAvailable ? "available" : ""} ${
+              seat.isOccupied ? "occupied" : ""
+            } m-1 p-2 border rounded-t-3xl text-center text-black`}
+            style={{
+              backgroundColor: seat.isOccupied
+                ? "red" // Color for occupied seats
+                : seat.isAvailable
+                ? "green" // Color for available seats
+                : "gray", // Color for unoccupied seats
+            }}
+          >
+            {rowIndex * seats[0].length + (colIndex + 1)}
+          </div>
+        ))}
+      </div>
+    ));
+  };
+
+  const updateSelectedSeats = (updatedSeats) => {
+    const selected = [];
+    // Check if seats is properly initialized and has rows
+    if (seats.length > 0 && seats[0]) {
+      updatedSeats.forEach((row, rowIndex) => {
+        row.forEach((seat, colIndex) => {
+          if (seat.isAvailable) {
+            // Only add available seats
+            const seatNumber = rowIndex * seats[0].length + (colIndex + 1);
+            selected.push(seatNumber); // Add seat number to the array
+          }
+        });
+      });
+    }
+    // Join the selected seat numbers into a comma-separated string
+    setSelectedSeats(selected.join(",")); // Save as a string
+  };
 
   const handlePaymentSuccess = async (details) => {
     // Display payment success message
@@ -167,7 +293,7 @@ const BuyTicketPage = () => {
   const handlePurchase = async (details) => {
     // Get the current user's UID
     const auth = getAuth();
-    const userId = auth.currentUser.uid; // Move this line up
+    const userId = auth.currentUser.uid;
 
     // Generate a unique ticket ID based on type, price, and a random UUID
     const selectedTicket = ticketOptions.find(
@@ -185,12 +311,13 @@ const BuyTicketPage = () => {
       email,
       phoneNumber,
       ticketType: selectedTicketType,
-      quantity, // Keep the ticket ID in the QR code data
+      quantity,
+      occupiedSeats: selectedSeats, // Add the selected seats here
     });
 
     // Create the new purchase object
     const newPurchase = {
-      uid: userId, // Store the user's UID instead of the ticket ID
+      uid: userId,
       firstName,
       lastName,
       email,
@@ -200,10 +327,11 @@ const BuyTicketPage = () => {
       totalAmount,
       date: new Date().toLocaleDateString(),
       eventName: selectedEvent?.name,
-      eventId: selectedEvent?.id, // Store the event ID
+      eventId: selectedEvent?.id,
       eventPosterURL: selectedEvent?.eventPosterURL,
       qrCodeData,
-      purchaseTimestamp: new Date(), // Include timestamp with both date and time
+      purchaseTimestamp: new Date(),
+      occupiedSeats: selectedSeats, // Save the occupied seats
     };
 
     // Check if the ticket ID already exists for the same user
@@ -217,15 +345,11 @@ const BuyTicketPage = () => {
     const eventRef = doc(db, "events", selectedEvent.id);
     const customerRef = collection(eventRef, "customers");
 
-    // Use the ticket ID as the document ID for purchases
     if (!ticketExists) {
       // Save the new purchase
-      await setDoc(
-        doc(customerRef, ticketID), // Use ticketID as the document ID
-        {
-          ...newPurchase,
-        }
-      ); // No need for merge since we are creating a new document
+      await setDoc(doc(customerRef, ticketID), {
+        ...newPurchase,
+      });
 
       // Update the purchase history state
       setPurchaseHistory((prevHistory) => {
@@ -237,27 +361,31 @@ const BuyTicketPage = () => {
         );
         return newHistory;
       });
-      const auth = getAuth();
-      const user = auth.currentUser;
 
-      if (user) {
-        const userDoc = doc(db, " users", user.uid);
-        const docSnap = await getDoc(userDoc);
-        if (docSnap.exists()) {
-          const userData = docSnap.data();
-          setFirstName(userData.firstName || "");
-          setLastName(userData.lastName || "");
-          setEmail(user.email);
-          setPhoneNumber(userData.phoneNumber || "");
+      // Update the occupied field in the event document
+      const tickets = selectedEvent.tickets.map((ticket) => {
+        if (ticket.type === selectedTicketType) {
+          // Increase the occupied count
+          return {
+            ...ticket,
+            occupied: (ticket.occupied || 0) + quantity, // Ensure to initialize if undefined
+            remainingQuantity:
+              (ticket.remainingQuantity || ticket.quantity) - quantity, // Update remainingQuantity
+          };
         }
-      }
+        return ticket;
+      });
+
+      // Update the event document
+      await setDoc(eventRef, { tickets }, { merge: true });
+
+      // Reset form fields
       setQuantity(1);
       setSelectedTicketType(
         ticketOptions.length > 0 ? ticketOptions[0].type : ""
       );
       toast.success("Ticket Purchased");
     } else {
-      // Optionally, alert the user that the ticket ID already exists
       alert("You already purchased a ticket with this ID for this event.");
     }
   };
@@ -340,9 +468,28 @@ const BuyTicketPage = () => {
     arrows: true,
   };
 
+  const formatOccupiedSeats = (occupiedSeats) => {
+    if (!occupiedSeats) return ""; // Return empty string if no seats
+
+    // Split the string into an array of numbers
+    const seatsArray = occupiedSeats.split(",").map(Number);
+
+    // Get the first and last seat numbers
+    const firstSeat = Math.min(...seatsArray);
+    const lastSeat = Math.max(...seatsArray);
+
+    // If all seats are the same, return just that seat
+    if (firstSeat === lastSeat) {
+      return `${firstSeat}`;
+    }
+
+    // Return the formatted string
+    return `${firstSeat}-${lastSeat}`;
+  };
+
   return (
     <div className="bg-neutral-900 min-h-screen text-white">
-      <ToastContainer /> {/* Add ToastContainer to your component */}
+      <ToastContainer />
       <div className="sticky top-0 z-50 navbar">
         <Navbar />
       </div>
@@ -409,7 +556,6 @@ const BuyTicketPage = () => {
 
         {selectedEvent && (
           <div className="mt-8 flex flex-col md:flex-row justify-between">
-            {/* Seat Map Container */}
             <div className="md:w-2/3">
               <div className="h-70 bg-gray-300 rounded-lg mb-5">
                 <img
@@ -418,6 +564,11 @@ const BuyTicketPage = () => {
                   className="rounded-lg object-cover h-full w-full"
                 />
               </div>
+              <SeatSelectionModal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                renderSeats={renderSeats}
+              />
             </div>
             <div className="md:w-1/3 ml-0 md:ml-8">
               <form onSubmit={handlePurchase} className="space-y-4">
@@ -490,11 +641,32 @@ const BuyTicketPage = () => {
                     className="block text-lg font-medium mb-1"
                     style={{ fontFamily: "Bebas Neue, sans-serif" }}
                   >
+                    Quantity
+                  </label>
+                  <input
+                    type="number"
+                    value={quantity}
+                    onChange={(e) => setQuantity(parseInt(e.target.value) || 1)}
+                    min="1"
+                    max={
+                      ticketOptions.find(
+                        (ticket) => ticket.type === selectedTicketType
+                      )?.quantity || 10
+                    }
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-black"
+                    required
+                  />
+                </div>
+                <div>
+                  <label
+                    className="block text-lg font-medium mb-1"
+                    style={{ fontFamily: "Bebas Neue, sans-serif" }}
+                  >
                     Ticket Type
                   </label>
                   <select
                     value={selectedTicketType}
-                    onChange={(e) => setSelectedTicketType(e.target.value)}
+                    onChange={handleTicketTypeChange}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-black"
                     required
                   >
@@ -518,31 +690,17 @@ const BuyTicketPage = () => {
                       Available Quantity:{" "}
                       {ticketOptions.find(
                         (ticket) => ticket.type === selectedTicketType
-                      )?.quantity || 0}
+                      )?.remainingQuantity !== undefined
+                        ? ticketOptions.find(
+                            (ticket) => ticket.type === selectedTicketType
+                          ).remainingQuantity
+                        : ticketOptions.find(
+                            (ticket) => ticket.type === selectedTicketType
+                          )?.quantity || 0}
                     </p>
                   )}
                 </div>
-                <div>
-                  <label
-                    className="block text-lg font-medium mb-1"
-                    style={{ fontFamily: "Bebas Neue, sans-serif" }}
-                  >
-                    Quantity
-                  </label>
-                  <input
-                    type="number"
-                    value={quantity}
-                    onChange={(e) => setQuantity(parseInt(e.target.value) || 1)}
-                    min="1"
-                    max={
-                      ticketOptions.find(
-                        (ticket) => ticket.type === selectedTicketType
-                      )?.quantity || 10
-                    }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-black"
-                    required
-                  />
-                </div>
+
                 <div>
                   <p
                     className="text-lg font-bold mb-1"
@@ -557,7 +715,6 @@ const BuyTicketPage = () => {
           </div>
         )}
 
-        {/* Purchase History Section Below Form */}
         {purchaseHistory.length > 0 && (
           <div className="mt-12">
             <h2
@@ -607,6 +764,12 @@ const BuyTicketPage = () => {
                       className="text-lg mb-1 text-black"
                       style={{ fontFamily: "Bebas Neue, sans-serif" }}
                     >
+                      Seats: {formatOccupiedSeats(purchase.occupiedSeats)}
+                    </p>
+                    <p
+                      className="text-lg mb-1 text-black"
+                      style={{ fontFamily: "Bebas Neue, sans-serif" }}
+                    >
                       Total Amount: ₱{purchase.totalAmount}
                     </p>
                     <p
@@ -618,7 +781,7 @@ const BuyTicketPage = () => {
                   </div>
                   <div className="mt-4">
                     <p
-                      className="text-sm text-center text-black mx-5 my-2"
+                      className="text-sm text-center text-black mx-5"
                       style={{ fontFamily: "Bebas Neue, sans-serif" }}
                     >
                       City College of Angeles, Arayat Blvd., Barangay Pampang,

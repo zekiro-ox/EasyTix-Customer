@@ -6,6 +6,33 @@
     background-color: #1a1a1a; /* Match your design */
     height: 60px; /* Define a fixed height for the navbar */
 }
+.seat {
+    cursor: pointer;
+    background-color: #ffffff; /* Default seat color */
+    transition: background-color 0.3s;
+    width: 65px;  /* Fixed width */
+    height: 60px; /* Fixed height */
+    display: flex; /* Use flexbox for centering text */
+    align-items: center; /* Center vertically */
+    justify-content: center; /* Center horizontally */
+    border: 2px solid #ccc; /* Add a border for better visibility */ /* Slightly rounded corners */
+}
+
+.seat.selected {
+    background-color: rgb(0, 104, 17); /* Selected seat color */
+    color: white; /* Change text color for selected seats */
+}
+
+.seat:hover {
+    background-color: #e5e7eb; /* Change color on hover */
+}
+.available {
+    background-color: green; /* Color for available seats */
+  }
+  
+  .occupied {
+    background-color: red; /* Color for occupied seats */
+  }
 
 /* PayPal button container styles */
 #paypal-button-container {
