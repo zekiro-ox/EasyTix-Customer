@@ -1,6 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { getAuth } from "firebase/auth"; // Import Firebase Auth
-import { getFirestore, doc, getDoc, updateDoc } from "firebase/firestore"; // Import Firestore functions
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  updateDoc,
+  collection,
+  addDoc,
+} from "firebase/firestore"; // Import Firestore functions
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage"; // Import Firebase Storage functions
 import Navbar from "./Navbar";
 import BackgroundImage from "./assets/Background.jpg"; // Adjust this path to your background image
@@ -17,6 +24,8 @@ const Profile = () => {
   const [phoneNumber, setPhoneNumber] = useState(""); // State for phone number
   const [profilePicture, setProfilePicture] = useState(null); // State for profile picture
   const [imageUrl, setImageUrl] = useState(""); // State for image URL
+  const [feedback, setFeedback] = useState(""); // State for feedback message
+  const [feedbackSuccess, setFeedbackSuccess] = useState(false); // State for feedback submission success message
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -104,6 +113,31 @@ const Profile = () => {
       const url = await getDownloadURL(storageRef); // Get the download URL
       setImageUrl(url); // Set the image URL state
       setProfilePicture(file); // Set the profile picture state
+    }
+  };
+
+  const handleFeedbackSubmit = async () => {
+    const auth = getAuth();
+    const currentUser = auth.currentUser;
+
+    if (currentUser) {
+      const db = getFirestore();
+      const feedbackCollection = collection(
+        db,
+        "users",
+        currentUser.uid,
+        "feedback"
+      ); // Reference to the feedback subcollection
+
+      // Add feedback to Firestore
+      await addDoc(feedbackCollection, {
+        feedback,
+        createdAt: new Date(),
+      });
+
+      setFeedback(""); // Clear the feedback input
+      setFeedbackSuccess(true); // Set success message
+      setTimeout(() => setFeedbackSuccess(false), 3000); // Clear success message after 3 seconds
     }
   };
 
@@ -306,6 +340,34 @@ const Profile = () => {
                     </button>
                   </>
                 )}
+                {/* Feedback Section */}
+                <div className="mt-6">
+                  <h2
+                    className="text-2xl font-extrabold text-violet-500 mb-4"
+                    style={{ fontFamily: "Bebas Neue, sans-serif" }}
+                  >
+                    Send Feedback
+                  </h2>
+                  <textarea
+                    value={feedback}
+                    onChange={(e) => setFeedback(e.target.value)}
+                    className="bg-neutral-900 p-2 rounded-md w-full mb-2"
+                    placeholder="Your feedback..."
+                  />
+                  <button
+                    type="button"
+                    className="text-white p-2 rounded-md bg-violet-500 hover:bg-violet-600 mt-2"
+                    style={{ fontFamily: "Bebas Neue, sans-serif" }}
+                    onClick={handleFeedbackSubmit}
+                  >
+                    Submit Feedback
+                  </button>
+                  {feedbackSuccess && (
+                    <p className="text-green-500 mt-2">
+                      Feedback submitted successfully!
+                    </p>
+                  )}
+                </div>
               </div>
             </div>
           </div>

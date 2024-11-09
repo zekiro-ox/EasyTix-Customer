@@ -4,8 +4,7 @@ import {
   collection,
   setDoc,
   doc,
-  addDoc,
-  getDocs,
+  onSnapshot,
   getDoc,
 } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
@@ -15,8 +14,9 @@ import "react-toastify/dist/ReactToastify.css";
 import BackgroundImage from "./assets/Background.jpg";
 
 const ContactUsPage = () => {
+  const [subject, setSubject] = useState("");
   const [message, setMessage] = useState("");
-  const [inquiriesHistory, setInquiriesHistory] = useState([]);
+  const [conversations, setConversations] = useState([]);
   const [userName, setUserName] = useState("");
 
   const handleSubmit = async (e) => {
@@ -28,49 +28,43 @@ const ContactUsPage = () => {
       const db = getFirestore();
       const userId = user.uid;
 
-      const userDocRef = doc(db, "messages", userId);
-      await setDoc(
-        userDocRef,
-        {
-          name: userName,
-          email: user.email,
-        },
-        { merge: true }
-      );
-
-      const concernsRef = collection(userDocRef, "concerns");
-      await addDoc(concernsRef, {
+      // Create a new conversation
+      const conversationRef = doc(collection(db, "conversations"));
+      await setDoc(conversationRef, {
+        sender: userId,
+        subject,
         message,
-        date: new Date().toISOString(),
-        adminResponse: "", // You can set this later based on your logic
+        timestamp: new Date().toISOString(),
       });
 
       toast.success("Message Sent!");
-      console.log("Contact Us form submitted", { message });
+      console.log("Contact Us form submitted", { subject, message });
+      setSubject("");
       setMessage("");
-      fetchInquiriesHistory();
     } else {
       console.error("No user is signed in.");
     }
   };
 
-  const fetchInquiriesHistory = async () => {
+  useEffect(() => {
     const auth = getAuth();
     const user = auth.currentUser;
 
     if (user) {
       const db = getFirestore();
-      const userDocRef = doc(db, "messages", user.uid);
-      const concernsRef = collection(userDocRef, "concerns");
-      const snapshot = await getDocs(concernsRef);
-      const history = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
+      const conversationsRef = collection(db, "conversations");
 
-      setInquiriesHistory(history);
+      const unsubscribe = onSnapshot(conversationsRef, (snapshot) => {
+        const convos = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setConversations(convos);
+      });
+
+      return () => unsubscribe();
     }
-  };
+  }, []);
 
   useEffect(() => {
     const fetchUserName = async () => {
@@ -92,7 +86,6 @@ const ContactUsPage = () => {
       }
     };
 
-    fetchInquiriesHistory();
     fetchUserName();
   }, []);
 
@@ -116,47 +109,41 @@ const ContactUsPage = () => {
             >
               Contact Us
             </h2>
-            <div className="overflow-y-auto max-w-lg mx-auto h-96 border border-gray-700 rounded-md p-4 mb-4">
-              {inquiriesHistory.length > 0 ? (
-                inquiriesHistory.map((inquiry) => (
-                  <div key={inquiry.id} className="mb-4">
-                    <div
-                      className={`flex ${
-                        inquiry.adminResponse ? "justify-start" : "justify-end"
-                      }`}
-                    >
-                      <div
-                        className={`max-w-xs p-3 rounded-lg ${
-                          inquiry.adminResponse
-                            ? "bg-violet-600"
-                            : "bg-neutral-600"
-                        } text-white`}
-                      >
-                        <div className="font-semibold">
-                          {inquiry.adminResponse ? "Admin" : userName}:
-                        </div>
-                        <div className="text-gray-400 text-sm">
-                          {inquiry.date}
-                        </div>
-                        <div className="text-gray-300">{inquiry.message}</div>
-                      </div>
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <p className="text-gray-400">No inquiries history available.</p>
-              )}
-            </div>
             <form
               onSubmit={handleSubmit}
               className="space-y-6 max-w-lg mx-auto"
             >
+              <div className="mb-4">
+                <label htmlFor="subject" className="block mb-1">
+                  Subject
+                </label>
+                <select
+                  id="subject"
+                  name="subject"
+                  required
+                  className="mt-1 p-2 border border-gray-300 rounded-md w-full bg-neutral-700 text-white"
+                  onChange={(e) => setSubject(e.target.value)}
+                  value={subject}
+                >
+                  <option value="" disabled>
+                    Select a problem
+                  </option>
+                  <option value="Ticket Availability">
+                    Ticket Availability
+                  </option>
+                  <option value="Payment Issues">Payment Issues</option>
+                  <option value="Refund Requests">Refund Requests</option>
+                  <option value="Event Information">Event Information</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
               <div className="mb-4">
                 <textarea
                   id="message"
                   name="message"
                   required
                   className="mt-1 p-2 border border-gray-300 rounded-md w-full bg-neutral-700 text-white"
+                  placeholder="Your message"
                   onChange={(e) => setMessage(e.target.value)}
                   value={message}
                 />
@@ -169,9 +156,83 @@ const ContactUsPage = () => {
                 Send Message
               </button>
             </form>
+            <div className="overflow-y-auto max-w-lg mx-auto h-96 border border-gray-700 rounded-md p-4 mb-4 mt-4">
+              {conversations.length > 0 ? (
+                conversations.map((conversation) => (
+                  <div key={conversation.id} className="mb-4">
+                    <div className="bg-neutral-600 p-4 rounded-lg shadow-md">
+                      <div className="font-semibold">{userName}:</div>
+                      <div className="text-gray-400 text-sm">
+                        {new Date(conversation.timestamp).toLocaleString()}
+                      </div>
+                      <div className="text-gray-300">
+                        <strong>Subject:</strong> {conversation.subject}
+                      </div>
+                      <div className="text-gray-300">
+                        {conversation.message}
+                      </div>
+                      {/* Fetch and display replies */}
+                      <div className="mt-2">
+                        <h4 className="font-semibold text-gray-200">
+                          Replies:
+                        </h4>
+                        <div className="space-y-2">
+                          {/* Assuming replies are stored in a subcollection */}
+                          <Replies conversationId={conversation.id} />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <p className="text-gray-400">No conversations available.</p>
+              )}
+            </div>
           </div>
         </div>
       </div>
+    </div>
+  );
+};
+
+const Replies = ({ conversationId }) => {
+  const [replies, setReplies] = useState([]);
+
+  useEffect(() => {
+    const db = getFirestore();
+    const repliesRef = collection(
+      db,
+      "conversations",
+      conversationId,
+      "replies"
+    );
+
+    const unsubscribe = onSnapshot(repliesRef, (snapshot) => {
+      const fetchedReplies = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setReplies(fetchedReplies);
+    });
+
+    return () => unsubscribe();
+  }, [conversationId]);
+
+  return (
+    <div>
+      {replies.length > 0 ? (
+        replies.map((reply) => (
+          <div key={reply.id} className="bg-neutral-500 p-2 rounded-md">
+            <div className="font-semibold">Admin:</div>
+            <div className="text-gray-300">{reply.reply}</div>
+            <div className="text-gray-400 text-sm">
+              {new Date(reply.timestamp).toLocaleString()}
+            </div>
+          </div>
+        ))
+      ) : (
+        <p className="text-gray-400">No replies yet.</p>
+      )}
     </div>
   );
 };
