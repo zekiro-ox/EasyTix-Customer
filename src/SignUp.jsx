@@ -4,6 +4,8 @@ import Logo from "./assets/CompanyLogo.png";
 import { auth } from "./config/firebase"; // Import the Firebase auth object
 import { createUserWithEmailAndPassword } from "firebase/auth"; // Import Firebase auth methods
 import { getFirestore, doc, setDoc } from "firebase/firestore"; // Import Firestore functions
+import { ToastContainer, toast } from "react-toastify"; // Import toast
+import "react-toastify/dist/ReactToastify.css"; // Import styles
 
 const CustomerSignUpPage = () => {
   const [username, setUsername] = useState("");
@@ -11,15 +13,42 @@ const CustomerSignUpPage = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState(null);
+  const [passwordValid, setPasswordValid] = useState(true); // Track password validity
   const navigate = useNavigate();
+
+  const validatePassword = (password) => {
+    const passwordRegex =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{12,16}$/;
+    return passwordRegex.test(password);
+  };
 
   const handleSignUp = async (e) => {
     e.preventDefault();
-    setError(null);
 
     if (password !== confirmPassword) {
-      setError("Passwords do not match");
+      toast.error("Passwords do not match");
+      return;
+    }
+
+    if (!validatePassword(password)) {
+      toast.error(
+        "Password must be 12-16 characters long, include at least one uppercase letter, one lowercase letter, one number, and one special character."
+      );
+      return;
+    }
+
+    // Check if password is similar to username or email
+    const lowerCaseUsername = username.toLowerCase();
+    const lowerCaseEmail = email.toLowerCase();
+    const lowerCasePassword = password.toLowerCase();
+
+    if (
+      lowerCasePassword.includes(lowerCaseUsername) ||
+      lowerCasePassword.includes(lowerCaseEmail)
+    ) {
+      toast.error(
+        "Password should not contain parts of your username or email."
+      );
       return;
     }
 
@@ -44,7 +73,7 @@ const CustomerSignUpPage = () => {
       navigate("/login"); // Redirect to login page after successful signup
     } catch (error) {
       console.error("Error signing up", error);
-      setError(error.message);
+      toast.error(error.message); // Show error message as toast
     }
   };
 
@@ -52,8 +81,15 @@ const CustomerSignUpPage = () => {
     setShowPassword(!showPassword);
   };
 
+  const handlePasswordChange = (e) => {
+    const newPassword = e.target.value;
+    setPassword(newPassword);
+    setPasswordValid(validatePassword(newPassword)); // Update validity on change
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center px-4 py-12 sm:px-6 lg:px-8 bg-neutral-900">
+      <ToastContainer /> {/* Add ToastContainer here */}
       <div className="w-full max-w-md space-y-8">
         <div className="flex items-center justify-center mb-8">
           <img src={Logo} alt="Company Logo" className="h-20 w-auto" />
@@ -65,9 +101,6 @@ const CustomerSignUpPage = () => {
           >
             Create an Account
           </h2>
-          {error && (
-            <div className="text-red-500 text-center mb-4">{error}</div>
-          )}
           <div>
             <label htmlFor="username" className="sr-only">
               Username
@@ -77,7 +110,7 @@ const CustomerSignUpPage = () => {
               name="username"
               type="text"
               required
-              className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-red-600 focus:border-red-600 focus:z-10 sm:text-sm"
+              className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray- 500 text-gray-900 rounded-t-md focus:outline-none focus:ring-red-600 focus:border-red-600 focus:z-10 sm:text-sm"
               placeholder="Username"
               onChange={(e) => setUsername(e.target.value)}
             />
@@ -109,8 +142,15 @@ const CustomerSignUpPage = () => {
               required
               className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-red-600 focus:border-red-600 focus:z-10 sm:text-sm"
               placeholder="Password"
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={handlePasswordChange}
             />
+            {!passwordValid && password && (
+              <div className="text-red-500 text-xs mt-1">
+                Password must be 12-16 characters long, include at least one
+                uppercase letter, one lowercase letter, one number, and one
+                special character.
+              </div>
+            )}
           </div>
           <div>
             <label htmlFor="confirmPassword" className="sr-only">

@@ -14,10 +14,14 @@ const CustomerHomePage = () => {
       const db = getFirestore();
       const eventsCollection = collection(db, "events");
       const eventsSnapshot = await getDocs(eventsCollection);
-      const eventsList = eventsSnapshot.docs.map((doc) => ({
-        id: doc.id, // Ensure you include the document ID
-        ...doc.data(),
-      }));
+      const eventsList = eventsSnapshot.docs
+        .map((doc) => ({
+          id: doc.id, // Ensure you include the document ID
+          ...doc.data(),
+        }))
+        // Filter out events with eventStatus "archived"
+        .filter((event) => event.eventStatus !== "archived");
+
       setEvents(eventsList);
     };
 
@@ -33,6 +37,20 @@ const CustomerHomePage = () => {
       minute: "numeric",
       hour12: true,
     });
+  };
+
+  const getRegistrationStatus = (startDate, endDate) => {
+    const currentDate = new Date();
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+
+    if (currentDate < start) {
+      return "Starting Soon"; // Registration not started
+    } else if (currentDate >= start && currentDate <= end) {
+      return "Open"; // Registration ongoing
+    } else {
+      return "Closed"; // Registration ended
+    }
   };
 
   return (
@@ -58,95 +76,108 @@ const CustomerHomePage = () => {
                     <p className="text-white text-xl">No events available.</p>
                   </div>
                 )}
-                {events.map((event) => (
-                  <div
-                    key={event.id}
-                    className="bg-neutral-800 p-4 rounded-lg drop-shadow-lg cursor-pointer w-full max-w-3xl"
-                    onMouseEnter={() => setHoveredEvent(event.id)}
-                    onMouseLeave={() => setHoveredEvent(null)}
-                  >
-                    <img
-                      src={event.eventPosterURL || PosterPlaceholder}
-                      alt={event.name}
-                      className="rounded-lg mb-4 w-full h-60 object-cover"
-                    />
-                    <div className="flex items-center mb-2">
-                      <h2
-                        className="text-2xl font-extrabold text-violet-500 mr-4"
-                        style={{ fontFamily: "Bebas Neue, sans-serif" }}
-                      >
-                        {event.name}
-                      </h2>
-                      <h3
-                        className="text-xl text-white"
-                        style={{ fontFamily: "Bebas Neue, sans-serif" }}
-                      >
-                        {event.eventStartDate}
-                      </h3>
-                    </div>
-                    <p
-                      className="text-white"
-                      style={{ fontFamily: "Bebas Neue, sans-serif" }}
-                    >
-                      Registration Start Date:{" "}
-                      {new Date(event.startDate).toLocaleDateString()}
-                    </p>
-                    <p
-                      className="text-white"
-                      style={{ fontFamily: "Bebas Neue, sans-serif" }}
-                    >
-                      Registration End Date:{" "}
-                      {new Date(event.endDate).toLocaleDateString()}
-                    </p>
-                    <p
-                      className="text-white"
-                      style={{ fontFamily: "Bebas Neue, sans-serif" }}
-                    >
-                      Event Start Time: {formatTime(event.startTime)}
-                    </p>
-                    <p
-                      className="text-white"
-                      style={{ fontFamily: "Bebas Neue, sans-serif" }}
-                    >
-                      Event End Time: {formatTime(event.endTime)}
-                    </p>
-                    <p
-                      className="text-white"
-                      style={{ fontFamily: "Bebas Neue, sans-serif" }}
-                    >
-                      Venue: {event.venue}
-                    </p>
+                {events.map((event) => {
+                  const registrationStatus = getRegistrationStatus(
+                    event.startDate,
+                    event.endDate
+                  );
+
+                  return (
                     <div
-                      className={`bg-neutral-700 p-4 rounded-lg shadow-lg mt-5 transition-all duration-500 ease-in-out ${
-                        hoveredEvent === event.id
-                          ? "max-h-screen opacity-100"
-                          : "max-h-0 opacity-0"
-                      } overflow-hidden`}
+                      key={event.id}
+                      className="bg-neutral-800 p-4 rounded-lg drop-shadow-lg cursor-pointer w-full max-w-3xl"
+                      onMouseEnter={() => setHoveredEvent(event.id)}
+                      onMouseLeave={() => setHoveredEvent(null)}
                     >
-                      <h3
-                        className="text-2xl font-semibold mb-3 text-violet-400"
-                        style={{ fontFamily: "Bebas Neue, sans-serif" }}
-                      >
-                        Event Description
-                      </h3>
-                      <div className="event-description mb-4">
-                        <p className="text-white mb-4">{event.description}</p>
-                      </div>
-                      <Link
-                        to="/buy-ticket"
-                        className="no-underline text-black"
-                      >
-                        <button
-                          type="button"
-                          className="text-white p-2 rounded-md bg-violet-500 hover:bg-violet-600 mt-4"
+                      <img
+                        src={event.eventPosterURL || PosterPlaceholder}
+                        alt={event.name}
+                        className="rounded-lg mb-4 w-full h-60 object-cover"
+                      />
+                      <div className="flex items-center mb-2">
+                        <h2
+                          className="text-2xl font-extrabold text-violet-500 mr-4"
                           style={{ fontFamily: "Bebas Neue, sans-serif" }}
                         >
-                          Buy Ticket Now
-                        </button>
-                      </Link>
+                          {event.name}
+                        </h2>
+                        <h3
+                          className="text-xl text-white"
+                          style={{ fontFamily: "Bebas Neue, sans-serif" }}
+                        >
+                          {event.eventStartDate}
+                        </h3>
+                      </div>
+                      <p
+                        className="text-white"
+                        style={{ fontFamily: "Bebas Neue, sans-serif" }}
+                      >
+                        Registration Start Date:{" "}
+                        {new Date(event.startDate).toLocaleDateString()}
+                      </p>
+                      <p
+                        className="text-white"
+                        style={{ fontFamily: "Bebas Neue, sans-serif" }}
+                      >
+                        Registration End Date:{" "}
+                        {new Date(event.endDate).toLocaleDateString()}
+                      </p>
+                      <p
+                        className="text-white"
+                        style={{ fontFamily: "Bebas Neue, sans-serif" }}
+                      >
+                        Event Start Time: {formatTime(event.startTime)}
+                      </p>
+                      <p
+                        className="text-white"
+                        style={{ fontFamily: "Bebas Neue, sans-serif" }}
+                      >
+                        Event End Time: {formatTime(event.endTime)}
+                      </p>
+                      <p
+                        className="text-white"
+                        style={{ fontFamily: "Bebas Neue, sans-serif" }}
+                      >
+                        Venue: {event.venue}
+                      </p>
+                      <div
+                        className={`bg-neutral-700 p-4 rounded-lg shadow-lg mt-5 transition-all duration-500 ease-in-out ${
+                          hoveredEvent === event.id
+                            ? "max-h-screen opacity-100"
+                            : "max-h-0 opacity-0"
+                        } overflow-hidden`}
+                      >
+                        <h3
+                          className="text-2xl font-semibold mb-3 text-violet-400"
+                          style={{ fontFamily: "Bebas Neue, sans-serif" }}
+                        >
+                          Event Description
+                        </h3>
+                        <div className="event-description mb-4">
+                          <p className="text-white mb-4">{event.description}</p>
+                        </div>
+                        {registrationStatus === "Open" ? (
+                          <Link
+                            to="/buy-ticket"
+                            className="no-underline text-black"
+                          >
+                            <button
+                              type="button"
+                              className="text-white p-2 rounded-md bg-violet-500 hover:bg-violet-600 mt-4"
+                              style={{ fontFamily: "Bebas Neue, sans-serif" }}
+                            >
+                              Buy Ticket Now
+                            </button>
+                          </Link>
+                        ) : (
+                          <p className="text-white mt-4">
+                            {registrationStatus}
+                          </p>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           </div>

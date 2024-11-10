@@ -25,7 +25,6 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 // Modal Component for Seat Selection
-// Modal Component for Seat Selection
 const SeatSelectionModal = ({ isOpen, onClose, renderSeats }) => {
   if (!isOpen) return null;
 
@@ -90,10 +89,14 @@ const BuyTicketPage = () => {
       const db = getFirestore();
       const eventsCollection = collection(db, "events");
       const eventsSnapshot = await getDocs(eventsCollection);
-      const eventsList = eventsSnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
+      const eventsList = eventsSnapshot.docs
+        .map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }))
+        // Filter out events with eventStatus "archived"
+        .filter((event) => event.eventStatus !== "archived");
+
       setEvents(eventsList);
 
       const storage = getStorage();
@@ -114,7 +117,7 @@ const BuyTicketPage = () => {
       if (eventsList.length > 0) {
         setSelectedEvent(eventsList[0]);
         setTicketOptions([
-          { type: "None.", price: 0 },
+          { type: "None", price: 0 },
           ...(eventsList[0].tickets || []),
         ]); // Add "None" option
         if (eventsList[0].tickets.length > 0)
@@ -243,6 +246,7 @@ const BuyTicketPage = () => {
     setSeats(seats);
     updateSelectedSeats(seats); // Update the selected seats based on the initial configuration
   };
+
   const renderSeats = () => {
     return seats.map((row, rowIndex) => (
       <div key={rowIndex} className="flex justify-center mb-2">
@@ -283,6 +287,13 @@ const BuyTicketPage = () => {
     }
     // Join the selected seat numbers into a comma-separated string
     setSelectedSeats(selected.join(",")); // Save as a string
+  };
+
+  const isRegistrationOpen = (startDate, endDate) => {
+    const currentDate = new Date();
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    return currentDate >= start && currentDate <= end;
   };
 
   const handlePaymentSuccess = async (details) => {
@@ -486,7 +497,6 @@ const BuyTicketPage = () => {
     // Return the formatted string
     return `${firstSeat}-${lastSeat}`;
   };
-
   return (
     <div className="bg-neutral-900 min-h-screen text-white">
       <ToastContainer />
@@ -709,7 +719,16 @@ const BuyTicketPage = () => {
                     Total Amount: ₱{totalAmount}
                   </p>
                 </div>
-                <div id="paypal-button-container" className="my-4" />
+                {isRegistrationOpen(
+                  selectedEvent.startDate,
+                  selectedEvent.endDate
+                ) ? (
+                  <div id="paypal-button-container" className="my-4" />
+                ) : (
+                  <p className="text-red-500">
+                    Ticket sales are currently closed.
+                  </p>
+                )}
               </form>
             </div>
           </div>

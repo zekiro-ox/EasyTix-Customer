@@ -55,10 +55,13 @@ const ContactUsPage = () => {
       const conversationsRef = collection(db, "conversations");
 
       const unsubscribe = onSnapshot(conversationsRef, (snapshot) => {
-        const convos = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
+        const convos = snapshot.docs
+          .map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          }))
+          .reverse(); // Reverse the order of conversations
+
         setConversations(convos);
       });
 
