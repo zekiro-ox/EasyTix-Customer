@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import {
+  getAuth,
+  signInWithEmailAndPassword,
+  sendPasswordResetEmail,
+} from "firebase/auth";
 import Logo from "./assets/CompanyLogo.png";
 import { ToastContainer, toast } from "react-toastify"; // Import toast
 import "react-toastify/dist/ReactToastify.css"; // Import styles
@@ -14,6 +18,8 @@ const CustomerLoginPage = () => {
   const [isLockedOut, setIsLockedOut] = useState(false);
   const [lockoutTime, setLockoutTime] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isForgotPassword, setIsForgotPassword] = useState(false); // State for forgot password modal
+  const [isEmailSent, setIsEmailSent] = useState(false); // State to track if email has been sent
   const navigate = useNavigate();
   const auth = getAuth();
 
@@ -91,6 +97,16 @@ const CustomerLoginPage = () => {
       }
       return attempts;
     });
+  };
+
+  const handleForgotPassword = async () => {
+    try {
+      await sendPasswordResetEmail(auth, email);
+      toast.success("Password reset email sent!"); // Success toast
+      setIsEmailSent(true); // Set email sent state
+    } catch (error) {
+      toast.error("Error sending password reset email."); // Error toast
+    }
   };
 
   const minutesLeft = Math.floor(lockoutTime / 60);
@@ -241,7 +257,51 @@ const CustomerLoginPage = () => {
             Don't have an account? Sign up here
           </Link>
         </div>
+        <button
+          onClick={() => setIsForgotPassword(true)}
+          className="mt-4 text-violet-500 hover:text-violet-300"
+          style={{ fontFamily: "Bebas Neue, sans-serif" }}
+        >
+          Forgot Password?
+        </button>
       </div>
+      {/* Forgot Password Modal */}
+      {isForgotPassword && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg">
+            <h3 className="text-lg font-bold mb-4">Reset Password</h3>
+            <p className="mb-2">
+              Enter your email address to receive a password reset link.
+            </p>
+            <input
+              type="email"
+              className="border border-gray-300 rounded p-2 w-full mb-4"
+              placeholder="Email address"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+            <div className="flex justify-between">
+              <button
+                onClick={handleForgotPassword}
+                className="bg-violet-500 text-white px-4 py-2 rounded"
+              >
+                Send Reset Link
+              </button>
+              <button
+                onClick={() => setIsForgotPassword(false)}
+                className="bg-gray-300 text-black px-4 py-2 rounded"
+              >
+                Cancel
+              </button>
+            </div>
+            {isEmailSent && (
+              <p className="text-green-500 mt-4">
+                Email sent! Check your inbox.
+              </p>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

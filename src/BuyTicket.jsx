@@ -23,6 +23,7 @@ import TicketPoster from "./assets/Ticket.png";
 import { v4 as uuidv4 } from "uuid";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import TermsAndConditionsModal from "./TermsCondition";
 
 // Modal Component for Seat Selection
 const SeatSelectionModal = ({ isOpen, onClose, renderSeats }) => {
@@ -82,6 +83,8 @@ const BuyTicketPage = () => {
   const [selectedSeats, setSelectedSeats] = useState([]);
   const [seats, setSeats] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
+  const [isTermsModalOpen, setIsTermsModalOpen] = useState(false);
 
   // Fetch events from Firestore
   useEffect(() => {
@@ -235,18 +238,27 @@ const BuyTicketPage = () => {
       return Array.from({ length: columns }, (_, colIndex) => {
         const seatIndex = rowIndex * columns + colIndex;
 
+        // Only mark seats as occupied or available based on the total quantity
         return {
           isOccupied: seatIndex < occupiedSeats, // Mark as occupied if seatIndex is less than occupiedSeats
           isAvailable:
-            seatIndex >= occupiedSeats && seatIndex < occupiedSeats + quantity, // Mark as available based on user's selected quantity
+            seatIndex >= occupiedSeats &&
+            seatIndex < occupiedSeats + quantity &&
+            seatIndex < totalSeats, // Mark as available based on user's selected quantity and total seats
         };
       });
     });
+    const trimmedSeats = seats.flat().slice(0, totalSeats);
+    const finalSeats = [];
 
-    setSeats(seats);
-    updateSelectedSeats(seats); // Update the selected seats based on the initial configuration
+    // Recreate the rows based on the trimmed seats
+    for (let i = 0; i < trimmedSeats.length; i += columns) {
+      finalSeats.push(trimmedSeats.slice(i, i + columns));
+    }
+
+    setSeats(finalSeats);
+    updateSelectedSeats(finalSeats); // Update the selected seats based on the initial configuration
   };
-
   const renderSeats = () => {
     return seats.map((row, rowIndex) => (
       <div key={rowIndex} className="seat-row">
@@ -412,7 +424,7 @@ const BuyTicketPage = () => {
     if (paypalButtonContainer) {
       paypalButtonContainer.innerHTML = ""; // Clear existing buttons
 
-      if (paypal && totalAmount > 0) {
+      if (paypal && totalAmount > 0 && agreedToTerms) {
         paypal
           .Buttons({
             createOrder: (data, actions) => {
@@ -442,7 +454,7 @@ const BuyTicketPage = () => {
           .render(paypalButtonContainer); // Render the button in the cleared container
       }
     }
-  }, [totalAmount, ticketOptions]); // Ensure dependencies are correct // Also include ticketOptions in the dependency array
+  }, [totalAmount, ticketOptions, agreedToTerms]); // Ensure dependencies are correct // Also include ticketOptions in the dependency array
 
   const handlePaymentError = (error) => {
     // Handle payment error
@@ -731,6 +743,30 @@ const BuyTicketPage = () => {
                     Ticket sales are currently closed.
                   </p>
                 )}
+                <div className="flex items-center">
+                  <input
+                    id="agree-terms"
+                    name="agree-terms"
+                    type="checkbox"
+                    className="h-4 w-4 text-red-600 focus:ring-red-600 border-gray-300 rounded"
+                    checked={agreedToTerms}
+                    onChange={() => setAgreedToTerms(!agreedToTerms)}
+                  />
+                  <label
+                    htmlFor="agree-terms"
+                    className="ml-2 block text-sm text-gray-300"
+                    style={{ fontFamily: "Bebas Neue, sans-serif" }}
+                  >
+                    I agree to the{" "}
+                    <button
+                      type="button"
+                      onClick={() => setIsTermsModalOpen(true)}
+                      className="text-violet-500 hover:text-violet-300"
+                    >
+                      Terms and Conditions
+                    </button>
+                  </label>
+                </div>
               </form>
             </div>
           </div>
@@ -821,6 +857,10 @@ const BuyTicketPage = () => {
           </div>
         )}
       </div>
+      <TermsAndConditionsModal
+        isOpen={isTermsModalOpen}
+        onRequestClose={() => setIsTermsModalOpen(false)}
+      />
     </div>
   );
 };

@@ -6,6 +6,8 @@ import { createUserWithEmailAndPassword } from "firebase/auth"; // Import Fireba
 import { getFirestore, doc, setDoc } from "firebase/firestore"; // Import Firestore functions
 import { ToastContainer, toast } from "react-toastify"; // Import toast
 import "react-toastify/dist/ReactToastify.css"; // Import styles
+import PrivacyPolicyModal from "./PrivacyPolicy";
+import TermsAndConditionsModal from "./TermsCondition"; // Import the modal component
 
 const CustomerSignUpPage = () => {
   const [username, setUsername] = useState("");
@@ -14,6 +16,10 @@ const CustomerSignUpPage = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [passwordValid, setPasswordValid] = useState(true); // Track password validity
+  const [agreedToTerms, setAgreedToTerms] = useState(false); // Track agreement to terms
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isPrivacyModalOpen, setIsPrivacyModalOpen] = useState(false); // Track privacy policy modal visibility
+  const [isTermsModalOpen, setIsTermsModalOpen] = useState(false); // Track modal visibility
   const navigate = useNavigate();
 
   const validatePassword = (password) => {
@@ -48,6 +54,13 @@ const CustomerSignUpPage = () => {
     ) {
       toast.error(
         "Password should not contain parts of your username or email."
+      );
+      return;
+    }
+
+    if (!agreedToTerms) {
+      toast.error(
+        "You must agree to the Privacy Policy and Terms and Conditions."
       );
       return;
     }
@@ -96,7 +109,7 @@ const CustomerSignUpPage = () => {
         </div>
         <form onSubmit={handleSignUp} className="mt-8 space-y-6">
           <h2
-            className="text-center text-3xl font-extrabold text-violet-500"
+            className="text-center text -3xl font-extrabold text-violet-500"
             style={{ fontFamily: "Bebas Neue, sans-serif" }}
           >
             Create an Account
@@ -110,7 +123,7 @@ const CustomerSignUpPage = () => {
               name="username"
               type="text"
               required
-              className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray- 500 text-gray-900 rounded-t-md focus:outline-none focus:ring-red-600 focus:border-red-600 focus:z-10 sm:text-sm"
+              className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-red-600 focus:border-red-600 focus:z-10 sm:text-sm"
               placeholder="Username"
               onChange={(e) => setUsername(e.target.value)}
             />
@@ -185,6 +198,38 @@ const CustomerSignUpPage = () => {
               </label>
             </div>
           </div>
+          <div className="flex items-center">
+            <input
+              id="agree-terms"
+              name="agree-terms"
+              type="checkbox"
+              className="h-4 w-4 text-red-600 focus:ring-red-600 border-gray-300 rounded"
+              checked={agreedToTerms}
+              onChange={() => setAgreedToTerms(!agreedToTerms)}
+            />
+            <label
+              htmlFor="agree-terms"
+              className="ml-2 block text-sm text-gray-300"
+              style={{ fontFamily: "Bebas Neue, sans-serif" }}
+            >
+              I agree to the{" "}
+              <button
+                type="button"
+                onClick={() => setIsPrivacyModalOpen(true)}
+                className="text-violet-500 hover:text-violet-300"
+              >
+                Privacy Policy
+              </button>{" "}
+              and{" "}
+              <button
+                type="button"
+                onClick={() => setIsTermsModalOpen(true)}
+                className="text-violet-500 hover:text-violet-300"
+              >
+                Terms and Conditions
+              </button>
+            </label>
+          </div>
           <div>
             <button
               type="submit"
@@ -209,6 +254,14 @@ const CustomerSignUpPage = () => {
           </div>
         </form>
       </div>
+      <PrivacyPolicyModal
+        isOpen={isPrivacyModalOpen}
+        onRequestClose={() => setIsPrivacyModalOpen(false)}
+      />
+      <TermsAndConditionsModal
+        isOpen={isTermsModalOpen}
+        onRequestClose={() => setIsTermsModalOpen(false)}
+      />
     </div>
   );
 };

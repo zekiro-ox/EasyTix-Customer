@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   BrowserRouter,
   Routes,
@@ -6,8 +6,8 @@ import {
   Navigate,
   useLocation,
 } from "react-router-dom";
-import { TransitionGroup } from "react-transition-group"; // Import transition components
-import TransitionWrapper from "./TransitionWrapper"; // Import your new wrapper
+import { TransitionGroup } from "react-transition-group";
+import TransitionWrapper from "./TransitionWrapper";
 import CustomerLoginPage from "./Login";
 import CustomerSignUpPage from "./SignUp";
 import CustomerHomePage from "./Home";
@@ -15,8 +15,13 @@ import EventsPage from "./Event";
 import BuyTicketPage from "./BuyTicket";
 import ContactUsPage from "./Contact";
 import Profile from "./Profile";
+import PrivacyPolicyModal from "./PrivacyPolicy";
+import TermsAndConditionsModal from "./TermsCondition";
+import Modal from "react-modal"; // Import Modal
 import "./App.css";
-import "./transitions.css"; // Import your CSS transitions
+import "./transitions.css";
+
+Modal.setAppElement("#root"); // Set the app element globally, replace '#root' with your app's root element ID
 
 function App() {
   return (
@@ -27,29 +32,50 @@ function App() {
 }
 
 function AppContent() {
-  const location = useLocation(); // Get the current location
-  const nodeRef = React.useRef(null); // Create a ref for the transition
+  const location = useLocation();
+  const nodeRef = React.useRef(null);
+  const [isPrivacyPolicyOpen, setIsPrivacyPolicyOpen] = useState(false);
+  const [isTermsAndConditionsOpen, setIsTermsAndConditionsOpen] =
+    useState(false);
 
   return (
-    <TransitionGroup>
-      <TransitionWrapper
-        key={location.key}
-        nodeRef={nodeRef}
-        classNames="fade"
-        timeout={300}
-      >
-        <Routes location={location}>
-          <Route path="/login" element={<CustomerLoginPage />} />
-          <Route path="/signup" element={<CustomerSignUpPage />} />
-          <Route path="/customer-homepage" element={<CustomerHomePage />} />
-          <Route path="/events" element={<EventsPage />} />
-          <Route path="/buy-ticket" element={<BuyTicketPage />} />
-          <Route path="/contact-us" element={<ContactUsPage />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="*" element={<Navigate replace to="/login" />} />
-        </Routes>
-      </TransitionWrapper>
-    </TransitionGroup>
+    <>
+      <TransitionGroup>
+        <TransitionWrapper
+          key={location.key}
+          nodeRef={nodeRef}
+          classNames="fade"
+          timeout={300}
+        >
+          <Routes location={location}>
+            <Route path="/login" element={<CustomerLoginPage />} />
+            <Route
+              path="/signup"
+              element={
+                <CustomerSignUpPage
+                  setIsModalOpen={setIsPrivacyPolicyOpen}
+                  setIsTermsAndConditionsOpen={setIsTermsAndConditionsOpen}
+                />
+              }
+            />
+            <Route path="/customer-homepage" element={<CustomerHomePage />} />
+            <Route path="/events" element={<EventsPage />} />
+            <Route path="/buy-ticket" element={<BuyTicketPage />} />
+            <Route path="/contact-us" element={<ContactUsPage />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="*" element={<Navigate replace to="/login" />} />
+          </Routes>
+        </TransitionWrapper>
+      </TransitionGroup>
+      <PrivacyPolicyModal
+        isOpen={isPrivacyPolicyOpen}
+        onRequestClose={() => setIsPrivacyPolicyOpen(false)}
+      />
+      <TermsAndConditionsModal
+        isOpen={isTermsAndConditionsOpen}
+        onRequestClose={() => setIsTermsAndConditionsOpen(false)}
+      />
+    </>
   );
 }
 

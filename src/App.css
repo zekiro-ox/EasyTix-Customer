@@ -48,6 +48,27 @@
     max-height: 400px; /* Limit the height of the modal */
     overflow-y: auto; /* Enable scrolling if content exceeds height */
 }
+/* In your CSS file (e.g., App.css) */
+.modal {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    max-width: 600px;
+    margin: auto;
+    position: relative; /* Ensure the modal is positioned correctly */
+  }
+  
+  .overlay {
+    background: rgba(0, 0, 0, 0.75); /* Semi-transparent background */
+    position: fixed; /* Make sure it covers the entire screen */
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex; /* Center the modal */
+    justify-content: center;
+    align-items: center;
+  }
 
 /* PayPal button container styles */
 #paypal-button-container {
