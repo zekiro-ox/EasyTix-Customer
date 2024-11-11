@@ -32,7 +32,7 @@ const SeatSelectionModal = ({ isOpen, onClose, renderSeats }) => {
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
       <div className="bg-neutral-900 p-5 rounded-lg max-w-2xl w-full mx-4">
         <h2 className="text-xl font-bold mb-4 text-center">
-          Select Your Seats
+          Your seat reference
         </h2>
         <div className="overflow-y-auto max-h-60">{renderSeats()}</div>
 
