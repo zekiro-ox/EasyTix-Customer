@@ -18,6 +18,7 @@ const ContactUsPage = () => {
   const [message, setMessage] = useState("");
   const [conversations, setConversations] = useState([]);
   const [userName, setUserName] = useState("");
+  const [currentUserId, setCurrentUserId] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -51,6 +52,7 @@ const ContactUsPage = () => {
     const user = auth.currentUser;
 
     if (user) {
+      setCurrentUserId(user.uid); // Store the current user's ID
       const db = getFirestore();
       const conversationsRef = collection(db, "conversations");
 
@@ -161,32 +163,35 @@ const ContactUsPage = () => {
             </form>
             <div className="overflow-y-auto max-w-lg mx-auto h-96 border border-gray-700 rounded-md p-4 mb-4 mt-4">
               {conversations.length > 0 ? (
-                conversations.map((conversation) => (
-                  <div key={conversation.id} className="mb-4">
-                    <div className="bg-neutral-600 p-4 rounded-lg shadow-md">
-                      <div className="font-semibold">{userName}:</div>
-                      <div className="text-gray-400 text-sm">
-                        {new Date(conversation.timestamp).toLocaleString()}
-                      </div>
-                      <div className="text-gray-300">
-                        <strong>Subject:</strong> {conversation.subject}
-                      </div>
-                      <div className="text-gray-300">
-                        {conversation.message}
-                      </div>
-                      {/* Fetch and display replies */}
-                      <div className="mt-2">
-                        <h4 className="font-semibold text-gray-200">
-                          Replies:
-                        </h4>
-                        <div className="space-y-2">
-                          {/* Assuming replies are stored in a subcollection */}
-                          <Replies conversationId={conversation.id} />
+                conversations.map(
+                  (conversation) =>
+                    conversation.sender === currentUserId && (
+                      <div key={conversation.id} className="mb-4">
+                        <div className="bg-neutral-600 p-4 rounded-lg shadow-md">
+                          <div className="font-semibold">{userName}:</div>
+                          <div className="text-gray-400 text-sm">
+                            {new Date(conversation.timestamp).toLocaleString()}
+                          </div>
+                          <div className="text-gray-300">
+                            <strong>Subject:</strong> {conversation.subject}
+                          </div>
+                          <div className="text-gray-300">
+                            {conversation.message}
+                          </div>
+                          {/* Fetch and display replies */}
+                          <div className="mt-2">
+                            <h4 className="font-semibold text-gray-200">
+                              Replies:
+                            </h4>
+                            <div className="space-y-2">
+                              {/* Assuming replies are stored in a subcollection */}
+                              <Replies conversationId={conversation.id} />
+                            </div>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </div>
-                ))
+                    )
+                )
               ) : (
                 <p className="text-gray-400">No conversations available.</p>
               )}
