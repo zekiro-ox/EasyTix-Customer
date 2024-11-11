@@ -249,13 +249,15 @@ const BuyTicketPage = () => {
 
   const renderSeats = () => {
     return seats.map((row, rowIndex) => (
-      <div key={rowIndex} className="flex justify-center mb-2">
+      <div key={rowIndex} className="seat-row">
+        {" "}
+        {/* Use seat-row class for each row */}
         {row.map((seat, colIndex) => (
           <div
             key={colIndex}
             className={`seat ${seat.isAvailable ? "available" : ""} ${
               seat.isOccupied ? "occupied" : ""
-            } m-1 p-2 border rounded-t-3xl text-center text-black`}
+            } m-1`}
             style={{
               backgroundColor: seat.isOccupied
                 ? "red" // Color for occupied seats

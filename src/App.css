@@ -15,7 +15,8 @@
     display: flex; /* Use flexbox for centering text */
     align-items: center; /* Center vertically */
     justify-content: center; /* Center horizontally */
-    border: 2px solid #ccc; /* Add a border for better visibility */ /* Slightly rounded corners */
+    border: 2px solid #ccc; /* Add a border for better visibility */
+    border-radius: 5px; /* Slightly rounded corners */
 }
 
 .seat.selected {
@@ -26,13 +27,27 @@
 .seat:hover {
     background-color: #e5e7eb; /* Change color on hover */
 }
+
 .available {
     background-color: green; /* Color for available seats */
-  }
-  
-  .occupied {
+}
+
+.occupied {
     background-color: red; /* Color for occupied seats */
-  }
+}
+
+/* Container for the seat rows */
+.seat-row {
+    display: flex; /* Use flexbox for the row */
+    justify-content: center; /* Center the seats horizontally */
+    margin-bottom: 10px; /* Space between rows */
+}
+
+/* Optional: Add a class for the seat selection modal */
+.seat-selection-modal {
+    max-height: 400px; /* Limit the height of the modal */
+    overflow-y: auto; /* Enable scrolling if content exceeds height */
+}
 
 /* PayPal button container styles */
 #paypal-button-container {
