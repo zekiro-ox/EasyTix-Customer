@@ -107,7 +107,7 @@ const ContactUsPage = () => {
         />
         <div className="fixed inset-0 bg-gray-900 bg-opacity-25 backdrop-blur-sm" />
         <div className="relative z-10">
-          <div className="bg-neutral-900 py-12 px-6 md:mx-20 lg:mx-60 bg-opacity-75 backdrop-blur-md">
+          <div className="bg-neutral-900 py-12 px-6 md:mx-20 lg:mx-80 bg-opacity-75 backdrop-blur-md">
             <h2
               className="text-3xl font-bold mb-4 text-center text-violet-500"
               style={{ fontFamily: "Bebas Neue, sans-serif" }}

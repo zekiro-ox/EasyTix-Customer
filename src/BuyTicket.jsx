@@ -30,7 +30,7 @@ const SeatSelectionModal = ({ isOpen, onClose, renderSeats }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
       <div className="bg-neutral-900 p-5 rounded-lg max-w-2xl w-full mx-4">
         <h2 className="text-xl font-bold mb-4 text-center">
           Your seat reference
@@ -166,12 +166,27 @@ const BuyTicketPage = () => {
             ...doc.data(),
           }));
 
-          purchasesList.sort(
+          const purchasesWithStatus = await Promise.all(
+            purchasesList.map(async (purchase) => {
+              // Use the purchase.id as the ticketID since it's the document ID
+              const ticketStatusDoc = await getDoc(
+                doc(purchasesCollection, purchase.id)
+              );
+              return {
+                ...purchase,
+                isRegistered:
+                  ticketStatusDoc.exists() &&
+                  ticketStatusDoc.data().status === "Registered",
+              };
+            })
+          );
+
+          purchasesWithStatus.sort(
             (a, b) =>
               new Date(b.purchaseTimestamp.toDate()).getTime() -
               new Date(a.purchaseTimestamp.toDate()).getTime()
           );
-          setPurchaseHistory(purchasesList);
+          setPurchaseHistory(purchasesWithStatus);
         }
       }
     };
@@ -308,6 +323,14 @@ const BuyTicketPage = () => {
     const start = new Date(startDate);
     const end = new Date(endDate);
     return currentDate >= start && currentDate <= end;
+  };
+
+  const isNameAlreadyUsed = () => {
+    return purchaseHistory.some(
+      (purchase) =>
+        purchase.firstName.toLowerCase() === firstName.toLowerCase() &&
+        purchase.lastName.toLowerCase() === lastName.toLowerCase()
+    );
   };
 
   const handlePaymentSuccess = async (details) => {
@@ -737,7 +760,15 @@ const BuyTicketPage = () => {
                   selectedEvent.startDate,
                   selectedEvent.endDate
                 ) ? (
-                  <div id="paypal-button-container" className="my-4" />
+                  <div id="ppc-button-wrapper">
+                    {isNameAlreadyUsed() ? (
+                      <p className="text-red-500">
+                        You cannot purchase another ticket with the same name.
+                      </p>
+                    ) : (
+                      <div id="paypal-button-container" className="my-4" />
+                    )}
+                  </div>
                 ) : (
                   <p className="text-red-500">
                     Ticket sales are currently closed.
@@ -784,8 +815,13 @@ const BuyTicketPage = () => {
               {purchaseHistory.map((purchase, index) => (
                 <div
                   key={index}
-                  className={`border pb-4 flex flex-col items-center space-y-4 bg-slate-100 mx-auto ticket-container-${index}`}
+                  className={`relative border pb-4 flex flex-col items-center space-y-4 bg-slate-100 mx-auto ticket-container-${index}`}
                 >
+                  {purchase.isRegistered && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 text-white text-lg font-bold z-10">
+                      This ticket is already registered
+                    </div>
+                  )}
                   <div className="w-full">
                     <img
                       src={TicketPoster}
