@@ -109,7 +109,7 @@ const CustomerSignUpPage = () => {
         </div>
         <form onSubmit={handleSignUp} className="mt-8 space-y-6">
           <h2
-            className="text-center text -3xl font-extrabold text-violet-500"
+            className="text-center text-3xl font-extrabold text-violet-500"
             style={{ fontFamily: "Bebas Neue, sans-serif" }}
           >
             Create an Account
