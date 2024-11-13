@@ -120,12 +120,6 @@ const CustomerLoginPage = () => {
           <img src={Logo} alt="Company Logo" className="h-20 w-auto" />
         </div>
         <form onSubmit={handleSubmit} className="w-full max-w-md space-y-6">
-          <h2
-            className="text-center text-3xl font-extrabold text-violet-500"
-            style={{ fontFamily: "Bebas Neue, sans-serif" }}
-          >
-            Sign In
-          </h2>
           <div>
             <label htmlFor="email" className="sr-only">
               Email address
