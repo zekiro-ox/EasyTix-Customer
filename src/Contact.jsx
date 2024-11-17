@@ -28,20 +28,32 @@ const ContactUsPage = () => {
     if (user) {
       const db = getFirestore();
       const userId = user.uid;
-
-      // Create a new conversation
-      const conversationRef = doc(collection(db, "conversations"));
-      await setDoc(conversationRef, {
+      const newMessage = {
         sender: userId,
         subject,
         message,
         timestamp: new Date().toISOString(),
-      });
+      };
 
-      toast.success("Message Sent!");
-      console.log("Contact Us form submitted", { subject, message });
-      setSubject("");
-      setMessage("");
+      try {
+        // Create a new conversation in Firestore
+        const conversationRef = doc(collection(db, "conversations"));
+        await setDoc(conversationRef, newMessage);
+
+        // Optimistically update the state
+        setConversations((prevConversations) => [
+          { id: conversationRef.id, ...newMessage },
+          ...prevConversations,
+        ]);
+
+        toast.success("Message Sent!");
+        console.log("Contact Us form submitted", { subject, message });
+        setSubject("");
+        setMessage("");
+      } catch (error) {
+        console.error("Error sending message:", error);
+        toast.error("Failed to send message. Please try again.");
+      }
     } else {
       console.error("No user is signed in.");
     }
@@ -62,7 +74,7 @@ const ContactUsPage = () => {
             id: doc.id,
             ...doc.data(),
           }))
-          .reverse(); // Reverse the order of conversations
+          .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)); // Reverse the order of conversations
 
         setConversations(convos);
       });
@@ -230,7 +242,7 @@ const Replies = ({ conversationId }) => {
     <div>
       {replies.length > 0 ? (
         replies.map((reply) => (
-          <div key={reply.id} className="bg-neutral-500 p-2 rounded-md">
+          <div key={reply.id} className="bg-neutral-500 p-2 rounded-md mb-2">
             <div className="font-semibold">Admin:</div>
             <div className="text-gray-300">{reply.reply}</div>
             <div className="text-gray-400 text-sm">
