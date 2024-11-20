@@ -74,6 +74,9 @@
     position: relative;
     z-index: 1;
 }
+.Toastify__toast-container {
+    z-index: 9999 !important;
+  }
 
 /* PayPal button container styles */
 #paypal-button-container {

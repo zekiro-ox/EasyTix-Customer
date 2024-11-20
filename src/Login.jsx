@@ -62,6 +62,7 @@ const CustomerLoginPage = () => {
     e.preventDefault();
 
     if (isLockedOut) {
+      toast.dismiss();
       toast.error("Too many failed attempts. Please wait 10 minutes.");
       return;
     }
@@ -71,14 +72,29 @@ const CustomerLoginPage = () => {
     setIsLoading(true);
 
     try {
-      await signInWithEmailAndPassword(auth, email, password);
-      toast.success("Login successful!"); // Success toast
-      if (rememberMe) {
-        localStorage.setItem("rememberedEmail", email);
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      const user = userCredential.user;
+
+      if (user.emailVerified) {
+        toast.dismiss();
+        toast.success("Login successful!");
+        if (rememberMe) {
+          localStorage.setItem("rememberedEmail", email);
+        } else {
+          localStorage.removeItem("rememberedEmail");
+        }
+        navigate("/customer-homepage");
       } else {
-        localStorage.removeItem("rememberedEmail");
+        toast.dismiss();
+        toast.error(
+          "Email not verified. Please verify your email before logging in."
+        );
+        await auth.signOut(); // Sign out the user to prevent further access
       }
-      navigate("/customer-homepage");
     } catch (error) {
       handleFailedAttempt(); // Handle failed attempt
     } finally {
@@ -91,8 +107,10 @@ const CustomerLoginPage = () => {
       const attempts = prev + 1;
       if (attempts >= 3) {
         setIsLockedOut(true);
+        toast.dismiss();
         toast.error("Too many failed attempts. Please wait 10 minutes."); // Error toast
       } else {
+        toast.dismiss();
         toast.error("Invalid email or password. Please try again."); // Error toast
       }
       return attempts;
@@ -102,9 +120,11 @@ const CustomerLoginPage = () => {
   const handleForgotPassword = async () => {
     try {
       await sendPasswordResetEmail(auth, email);
+      toast.dismiss();
       toast.success("Password reset email sent!"); // Success toast
       setIsEmailSent(true); // Set email sent state
     } catch (error) {
+      toast.dismiss();
       toast.error("Error sending password reset email."); // Error toast
     }
   };

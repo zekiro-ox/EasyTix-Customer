@@ -2,7 +2,10 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Logo from "./assets/CompanyLogo.png";
 import { auth } from "./config/firebase"; // Import the Firebase auth object
-import { createUserWithEmailAndPassword } from "firebase/auth"; // Import Firebase auth methods
+import {
+  createUserWithEmailAndPassword,
+  sendEmailVerification,
+} from "firebase/auth"; // Import Firebase auth methods
 import { getFirestore, doc, setDoc } from "firebase/firestore"; // Import Firestore functions
 import { ToastContainer, toast } from "react-toastify"; // Import toast
 import "react-toastify/dist/ReactToastify.css"; // Import styles
@@ -32,11 +35,13 @@ const CustomerSignUpPage = () => {
     e.preventDefault();
 
     if (password !== confirmPassword) {
+      toast.dismiss();
       toast.error("Passwords do not match");
       return;
     }
 
     if (!validatePassword(password)) {
+      toast.dismiss();
       toast.error(
         "Password must be 12-16 characters long, include at least one uppercase letter, one lowercase letter, one number, and one special character."
       );
@@ -52,6 +57,7 @@ const CustomerSignUpPage = () => {
       lowerCasePassword.includes(lowerCaseUsername) ||
       lowerCasePassword.includes(lowerCaseEmail)
     ) {
+      toast.dismiss();
       toast.error(
         "Password should not contain parts of your username or email."
       );
@@ -59,6 +65,7 @@ const CustomerSignUpPage = () => {
     }
 
     if (!agreedToTerms) {
+      toast.dismiss();
       toast.error(
         "You must agree to the Privacy Policy and Terms and Conditions."
       );
@@ -73,6 +80,9 @@ const CustomerSignUpPage = () => {
       );
       // Signed in
       const user = userCredential.user;
+      await sendEmailVerification(user);
+      toast.dismiss();
+      toast.success("Verification email sent! Please check your inbox.");
 
       // Save username to Firestore
       const db = getFirestore();
@@ -81,11 +91,11 @@ const CustomerSignUpPage = () => {
         email: email,
         createdAt: new Date().toISOString(), // Optional: Save the creation date
       });
-
       console.log("Sign-up successful", user);
       navigate("/login"); // Redirect to login page after successful signup
     } catch (error) {
       console.error("Error signing up", error);
+      toast.dismiss();
       toast.error(error.message); // Show error message as toast
     }
   };
