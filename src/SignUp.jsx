@@ -10,7 +10,17 @@ import { getFirestore, doc, setDoc } from "firebase/firestore"; // Import Firest
 import { ToastContainer, toast } from "react-toastify"; // Import toast
 import "react-toastify/dist/ReactToastify.css"; // Import styles
 import PrivacyPolicyModal from "./PrivacyPolicy";
-import TermsAndConditionsModal from "./TermsCondition"; // Import the modal component
+import TermsAndConditionsModal from "./TermsCondition";
+
+const notify = (message, id, type = "error") => {
+  if (!toast.isActive(id)) {
+    if (type === "error") {
+      toast.error(message, { toastId: id });
+    } else if (type === "success") {
+      toast.success(message, { toastId: id });
+    }
+  }
+}; // Import the modal component
 
 const CustomerSignUpPage = () => {
   const [username, setUsername] = useState("");
@@ -35,20 +45,18 @@ const CustomerSignUpPage = () => {
     e.preventDefault();
 
     if (password !== confirmPassword) {
-      toast.dismiss();
-      toast.error("Passwords do not match");
+      notify("Passwords do not match", "password-mismatch");
       return;
     }
 
     if (!validatePassword(password)) {
-      toast.dismiss();
-      toast.error(
-        "Password must be 12-16 characters long, include at least one uppercase letter, one lowercase letter, one number, and one special character."
+      notify(
+        "Password must be 12-16 characters long, include at least one uppercase letter, one lowercase letter, one number, and one special character.",
+        "invalid-password"
       );
       return;
     }
 
-    // Check if password is similar to username or email
     const lowerCaseUsername = username.toLowerCase();
     const lowerCaseEmail = email.toLowerCase();
     const lowerCasePassword = password.toLowerCase();
@@ -57,17 +65,17 @@ const CustomerSignUpPage = () => {
       lowerCasePassword.includes(lowerCaseUsername) ||
       lowerCasePassword.includes(lowerCaseEmail)
     ) {
-      toast.dismiss();
-      toast.error(
-        "Password should not contain parts of your username or email."
+      notify(
+        "Password should not contain parts of your username or email.",
+        "password-username-email"
       );
       return;
     }
 
     if (!agreedToTerms) {
-      toast.dismiss();
-      toast.error(
-        "You must agree to the Privacy Policy and Terms and Conditions."
+      notify(
+        "You must agree to the Privacy Policy and Terms and Conditions.",
+        "terms-not-agreed"
       );
       return;
     }
@@ -78,25 +86,27 @@ const CustomerSignUpPage = () => {
         email,
         password
       );
-      // Signed in
       const user = userCredential.user;
       await sendEmailVerification(user);
-      toast.dismiss();
-      toast.success("Verification email sent! Please check your inbox.");
+      notify(
+        "Verification email sent! Please check your inbox.",
+        "email-sent",
+        "success"
+      );
 
-      // Save username to Firestore
       const db = getFirestore();
       await setDoc(doc(db, "users", user.uid), {
         username: username,
         email: email,
-        createdAt: new Date().toISOString(), // Optional: Save the creation date
+        createdAt: new Date().toISOString(),
       });
       console.log("Sign-up successful", user);
-      navigate("/login"); // Redirect to login page after successful signup
+      setTimeout(() => {
+        navigate("/login");
+      }, 2000);
     } catch (error) {
       console.error("Error signing up", error);
-      toast.dismiss();
-      toast.error(error.message); // Show error message as toast
+      notify(error.message, "signup-error");
     }
   };
 

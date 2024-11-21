@@ -9,6 +9,16 @@ import Logo from "./assets/CompanyLogo.png";
 import { ToastContainer, toast } from "react-toastify"; // Import toast
 import "react-toastify/dist/ReactToastify.css"; // Import styles
 
+const notify = (message, id, type = "error") => {
+  if (!toast.isActive(id)) {
+    if (type === "error") {
+      toast.error(message, { toastId: id });
+    } else if (type === "success") {
+      toast.success(message, { toastId: id });
+    }
+  }
+};
+
 const CustomerLoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -18,8 +28,8 @@ const CustomerLoginPage = () => {
   const [isLockedOut, setIsLockedOut] = useState(false);
   const [lockoutTime, setLockoutTime] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [isForgotPassword, setIsForgotPassword] = useState(false); // State for forgot password modal
-  const [isEmailSent, setIsEmailSent] = useState(false); // State to track if email has been sent
+  const [isForgotPassword, setIsForgotPassword] = useState(false);
+  const [isEmailSent, setIsEmailSent] = useState(false);
   const navigate = useNavigate();
   const auth = getAuth();
 
@@ -34,21 +44,23 @@ const CustomerLoginPage = () => {
   useEffect(() => {
     if (isLockedOut) {
       const timerDuration = 10 * 60; // 10 minutes in seconds
-      setLockoutTime(timerDuration);
+      if (lockoutTime === null) {
+        setLockoutTime(timerDuration);
+      }
       const timer = setInterval(() => {
         setLockoutTime((prevTime) => {
           if (prevTime <= 1) {
             clearInterval(timer);
             setIsLockedOut(false);
             setFailedAttempts(0);
-            return 0;
+            return null;
           }
           return prevTime - 1;
         });
-      }, 1000); // Update every second
+      }, 1000);
       return () => clearInterval(timer);
     }
-  }, [isLockedOut]);
+  }, [isLockedOut, lockoutTime]);
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
@@ -62,12 +74,14 @@ const CustomerLoginPage = () => {
     e.preventDefault();
 
     if (isLockedOut) {
-      toast.dismiss();
-      toast.error("Too many failed attempts. Please wait 10 minutes.");
+      notify(
+        "Too many failed attempts. Please wait 10 minutes.",
+        "lockout-toast"
+      );
       return;
     }
 
-    if (isLoading) return; // Prevent multiple submissions
+    if (isLoading) return;
 
     setIsLoading(true);
 
@@ -80,23 +94,24 @@ const CustomerLoginPage = () => {
       const user = userCredential.user;
 
       if (user.emailVerified) {
-        toast.dismiss();
-        toast.success("Login successful!");
+        notify("Login successful!", "login-success-toast", "success");
         if (rememberMe) {
           localStorage.setItem("rememberedEmail", email);
         } else {
           localStorage.removeItem("rememberedEmail");
         }
-        navigate("/customer-homepage");
+        setTimeout(() => {
+          navigate("/customer-homepage");
+        }, 2000);
       } else {
-        toast.dismiss();
-        toast.error(
-          "Email not verified. Please verify your email before logging in."
+        notify(
+          "Email not verified. Please verify your email before logging in.",
+          "email-verification-toast"
         );
-        await auth.signOut(); // Sign out the user to prevent further access
+        await auth.signOut();
       }
     } catch (error) {
-      handleFailedAttempt(); // Handle failed attempt
+      handleFailedAttempt();
     } finally {
       setIsLoading(false);
     }
@@ -107,11 +122,15 @@ const CustomerLoginPage = () => {
       const attempts = prev + 1;
       if (attempts >= 3) {
         setIsLockedOut(true);
-        toast.dismiss();
-        toast.error("Too many failed attempts. Please wait 10 minutes."); // Error toast
+        notify(
+          "Too many failed attempts. Please wait 10 minutes.",
+          "lockout-toast"
+        );
       } else {
-        toast.dismiss();
-        toast.error("Invalid email or password. Please try again."); // Error toast
+        notify(
+          "Invalid email or password. Please try again.",
+          "invalid-login-toast"
+        );
       }
       return attempts;
     });
@@ -120,12 +139,10 @@ const CustomerLoginPage = () => {
   const handleForgotPassword = async () => {
     try {
       await sendPasswordResetEmail(auth, email);
-      toast.dismiss();
-      toast.success("Password reset email sent!"); // Success toast
-      setIsEmailSent(true); // Set email sent state
+      notify("Password reset email sent!", "reset-email-toast", "success");
+      setIsEmailSent(true);
     } catch (error) {
-      toast.dismiss();
-      toast.error("Error sending password reset email."); // Error toast
+      notify("Error sending password reset email.", "reset-error-toast");
     }
   };
 
