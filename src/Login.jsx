@@ -5,6 +5,7 @@ import {
   signInWithEmailAndPassword,
   sendPasswordResetEmail,
 } from "firebase/auth";
+import { useAuth } from "./AuthProvider";
 import Logo from "./assets/CompanyLogo.png";
 import { ToastContainer, toast } from "react-toastify"; // Import toast
 import "react-toastify/dist/ReactToastify.css"; // Import styles
@@ -30,6 +31,7 @@ const CustomerLoginPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isForgotPassword, setIsForgotPassword] = useState(false);
   const [isEmailSent, setIsEmailSent] = useState(false);
+  const { setIsAuthenticated } = useAuth();
   const navigate = useNavigate();
   const auth = getAuth();
 
@@ -92,17 +94,25 @@ const CustomerLoginPage = () => {
         password
       );
       const user = userCredential.user;
-
       if (user.emailVerified) {
         notify("Login successful!", "login-success-toast", "success");
+
+        // Update authentication state
+        setIsAuthenticated(true);
+
+        // Remember email if applicable
         if (rememberMe) {
           localStorage.setItem("rememberedEmail", email);
         } else {
           localStorage.removeItem("rememberedEmail");
         }
+
+        // Redirect after a delay
         setTimeout(() => {
-          navigate("/customer-homepage");
+          navigate("/customer-homepage", { replace: true });
         }, 2000);
+
+        return;
       } else {
         notify(
           "Email not verified. Please verify your email before logging in.",
@@ -111,6 +121,7 @@ const CustomerLoginPage = () => {
         await auth.signOut();
       }
     } catch (error) {
+      console.error("Login error:", error);
       handleFailedAttempt();
     } finally {
       setIsLoading(false);

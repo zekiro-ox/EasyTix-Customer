@@ -17,6 +17,7 @@ import ContactUsPage from "./Contact";
 import Profile from "./Profile";
 import PrivacyPolicyModal from "./PrivacyPolicy";
 import TermsAndConditionsModal from "./TermsCondition";
+import ProtectedRoute from "./ProtectedRoute";
 import Modal from "react-modal"; // Import Modal
 import "./App.css";
 import "./transitions.css";
@@ -35,6 +36,7 @@ function AppContent() {
   const location = useLocation();
   const nodeRef = React.useRef(null);
   const [isPrivacyPolicyOpen, setIsPrivacyPolicyOpen] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isTermsAndConditionsOpen, setIsTermsAndConditionsOpen] =
     useState(false);
 
@@ -48,21 +50,48 @@ function AppContent() {
           timeout={300}
         >
           <Routes location={location}>
-            <Route path="/login" element={<CustomerLoginPage />} />
             <Route
-              path="/signup"
+              path="/login"
+              element={<CustomerLoginPage setAuth={setIsAuthenticated} />}
+            />
+            <Route
+              path="/customer-homepage"
               element={
-                <CustomerSignUpPage
-                  setIsModalOpen={setIsPrivacyPolicyOpen}
-                  setIsTermsAndConditionsOpen={setIsTermsAndConditionsOpen}
+                <ProtectedRoute
+                  isAuthenticated={isAuthenticated}
+                  element={CustomerHomePage}
                 />
               }
             />
-            <Route path="/customer-homepage" element={<CustomerHomePage />} />
+            <Route path="/signup" element={<CustomerSignUpPage />} />
             <Route path="/events" element={<EventsPage />} />
-            <Route path="/buy-ticket" element={<BuyTicketPage />} />
-            <Route path="/contact-us" element={<ContactUsPage />} />
-            <Route path="/profile" element={<Profile />} />
+            <Route
+              path="/buy-ticket"
+              element={
+                <ProtectedRoute
+                  isAuthenticated={isAuthenticated}
+                  element={BuyTicketPage}
+                />
+              }
+            />
+            <Route
+              path="/contact-us"
+              element={
+                <ProtectedRoute
+                  isAuthenticated={isAuthenticated}
+                  element={ContactUsPage}
+                />
+              }
+            />
+            <Route
+              path="/profile"
+              element={
+                <ProtectedRoute
+                  isAuthenticated={isAuthenticated}
+                  element={Profile}
+                />
+              }
+            />
             <Route path="*" element={<Navigate replace to="/login" />} />
           </Routes>
         </TransitionWrapper>
