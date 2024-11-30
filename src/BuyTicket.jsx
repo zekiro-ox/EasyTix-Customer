@@ -46,7 +46,7 @@ const SeatSelectionModal = ({ isOpen, onClose, renderSeats }) => {
             </div>
             <div className="flex items-center mr-4">
               <div className="w-4 h-4 bg-green-500 border border-black rounded-full mr-1"></div>
-              <span>Available</span>
+              <span>Your Seat</span>
             </div>
             <div className="flex items-center">
               <div className="w-4 h-4 bg-gray-400 border border-black rounded-full mr-1"></div>
@@ -238,6 +238,16 @@ const BuyTicketPage = () => {
     }
   };
 
+  const notify = (message, id, type = "error") => {
+    if (!toast.isActive(id)) {
+      if (type === "error") {
+        toast.error(message, { toastId: id });
+      } else if (type === "success") {
+        toast.success(message, { toastId: id });
+      }
+    }
+  };
+
   const fetchSeatingConfiguration = (ticket) => {
     const columns = parseInt(ticket.column); // Get the number of columns from the ticket
     const totalSeats = parseInt(ticket.quantity); // Use quantity as the total number of seats
@@ -303,12 +313,13 @@ const BuyTicketPage = () => {
   const updateSelectedSeats = (updatedSeats) => {
     const selected = [];
     // Check if seats is properly initialized and has rows
-    if (seats.length > 0 && seats[0]) {
+    if (updatedSeats.length > 0 && updatedSeats[0]) {
       updatedSeats.forEach((row, rowIndex) => {
         row.forEach((seat, colIndex) => {
           if (seat.isAvailable) {
             // Only add available seats
-            const seatNumber = rowIndex * seats[0].length + (colIndex + 1);
+            const seatNumber =
+              rowIndex * updatedSeats[0].length + (colIndex + 1);
             selected.push(seatNumber); // Add seat number to the array
           }
         });
@@ -334,7 +345,7 @@ const BuyTicketPage = () => {
   };
 
   const handlePaymentSuccess = async (details) => {
-    // Display payment success message
+    notify("Payment successful!", "payment-success", "success");
     setPaymentStatus("Payment successful!"); // Popup message
   };
 
@@ -354,13 +365,7 @@ const BuyTicketPage = () => {
 
     const qrCodeData = JSON.stringify({
       ticketID,
-      firstName,
-      lastName,
-      email,
-      phoneNumber,
-      ticketType: selectedTicketType,
-      quantity,
-      occupiedSeats: selectedSeats, // Add the selected seats here
+      // Add the selected seats here
     });
 
     // Create the new purchase object
@@ -371,7 +376,7 @@ const BuyTicketPage = () => {
       email,
       phoneNumber,
       ticketType: selectedTicketType,
-      quantity,
+      quantity: 1, // Set quantity to a constant value of 1
       totalAmount,
       date: new Date().toLocaleDateString(),
       eventName: selectedEvent?.name,
@@ -387,6 +392,18 @@ const BuyTicketPage = () => {
       (purchase) =>
         purchase.eventId === selectedEvent.id && purchase.ticketID === ticketID
     );
+
+    const totalTicketsPurchased =
+      purchaseHistory.reduce((acc, purchase) => acc + purchase.quantity, 0) + 1; // +1 for the current purchase
+
+    if (totalTicketsPurchased > 3) {
+      notify(
+        "You can only purchase a maximum of 3 tickets.",
+        "max-tickets",
+        "error"
+      );
+      return; // Exit the function if the limit is exceeded
+    }
 
     // Save the purchase in Firestore using the ticket ID as the document ID
     const db = getFirestore();
@@ -432,9 +449,13 @@ const BuyTicketPage = () => {
       setSelectedTicketType(
         ticketOptions.length > 0 ? ticketOptions[0].type : ""
       );
-      toast.success("Ticket Purchased");
+      notify("Ticket Purchased", "ticket-purchased", "success");
     } else {
-      alert("You already purchased a ticket with this ID for this event.");
+      notify(
+        "You already purchased a ticket with this ID for this event.",
+        "ticket-exists",
+        "error"
+      );
     }
   };
 
@@ -480,8 +501,8 @@ const BuyTicketPage = () => {
   }, [totalAmount, ticketOptions, agreedToTerms]); // Ensure dependencies are correct // Also include ticketOptions in the dependency array
 
   const handlePaymentError = (error) => {
-    // Handle payment error
     setPaymentStatus("Payment failed. Please try again.");
+    notify("Payment failed. Please try again.", "payment-failed", "error");
   };
 
   const downloadTicket = (purchase, index) => {
@@ -683,27 +704,7 @@ const BuyTicketPage = () => {
                     required
                   />
                 </div>
-                <div>
-                  <label
-                    className="block text-lg font-medium mb-1"
-                    style={{ fontFamily: "Bebas Neue, sans-serif" }}
-                  >
-                    Quantity
-                  </label>
-                  <input
-                    type="number"
-                    value={quantity}
-                    onChange={(e) => setQuantity(parseInt(e.target.value) || 1)}
-                    min="1"
-                    max={
-                      ticketOptions.find(
-                        (ticket) => ticket.type === selectedTicketType
-                      )?.quantity || 10
-                    }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-black"
-                    required
-                  />
-                </div>
+
                 <div>
                   <label
                     className="block text-lg font-medium mb-1"
@@ -770,7 +771,7 @@ const BuyTicketPage = () => {
                     )}
                   </div>
                 ) : (
-                  <p className="text-red-500">
+                  <p className="text-violet-600">
                     Ticket sales are currently closed.
                   </p>
                 )}
@@ -847,12 +848,6 @@ const BuyTicketPage = () => {
                     <QRCode value={purchase.qrCodeData} size={200} />
                   </div>
                   <div className="text-center">
-                    <p
-                      className="text-lg mb-1 text-black"
-                      style={{ fontFamily: "Bebas Neue, sans-serif" }}
-                    >
-                      Quantity: {purchase.quantity}
-                    </p>
                     <p
                       className="text-lg mb-1 text-black"
                       style={{ fontFamily: "Bebas Neue, sans-serif" }}
