@@ -1,5 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { getAuth } from "firebase/auth"; // Import Firebase Auth
+import {
+  getAuth,
+  EmailAuthProvider,
+  reauthenticateWithCredential,
+} from "firebase/auth"; // Import Firebase Auth
 import {
   getFirestore,
   doc,
@@ -25,7 +29,9 @@ const Profile = () => {
   const [profilePicture, setProfilePicture] = useState(null); // State for profile picture
   const [imageUrl, setImageUrl] = useState(""); // State for image URL
   const [feedback, setFeedback] = useState(""); // State for feedback message
-  const [feedbackSuccess, setFeedbackSuccess] = useState(false); // State for feedback submission success message
+  const [feedbackSuccess, setFeedbackSuccess] = useState(false);
+  const [password, setPassword] = useState(""); // State for password input
+  const [reauthError, setReauthError] = useState(""); // State for feedback submission success message
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -70,38 +76,64 @@ const Profile = () => {
   const handleEdit = () => {
     setIsEditing(true); // Enable edit mode
   };
+  const handleCancel = () => {
+    if (user) {
+      setFirstName(user.firstName || "");
+      setLastName(user.lastName || "");
+      setUsername(user.username || "");
+      setBio(user.bio || "");
+      setPhoneNumber(user.phoneNumber || "");
+      setImageUrl(user.profilePicture || "");
+    }
+    setPassword(""); // Clear the password field
+    setIsEditing(false); // Exit edit mode
+  };
 
   const handleSave = async () => {
     const auth = getAuth();
     const currentUser = auth.currentUser;
 
     if (currentUser) {
-      const db = getFirestore();
-      const userDoc = doc(db, "users", currentUser.uid);
+      // Reauthenticate the user
+      const credential = EmailAuthProvider.credential(
+        currentUser.email,
+        password
+      );
 
-      // Update user data in Firestore
-      await updateDoc(userDoc, {
-        firstName,
-        lastName,
-        username,
-        bio,
-        phoneNumber, // Save the phone number
-        profilePicture: imageUrl, // Save the image URL
-      });
+      try {
+        await reauthenticateWithCredential(currentUser, credential); // Verify user's password
 
-      setUser((prevUser) => ({
-        ...prevUser,
-        username,
-        firstName,
-        lastName,
-        bio,
-        phoneNumber, // Update the state with the new phone number
-        profilePicture: imageUrl, // Update the state with the new image URL
-      }));
-      setIsEditing(false); // Disable edit mode
+        const db = getFirestore();
+        const userDoc = doc(db, "users", currentUser.uid);
+
+        // Update user data in Firestore
+        await updateDoc(userDoc, {
+          firstName,
+          lastName,
+          username,
+          bio,
+          phoneNumber, // Save the phone number
+          profilePicture: imageUrl, // Save the image URL
+        });
+
+        setUser((prevUser) => ({
+          ...prevUser,
+          username,
+          firstName,
+          lastName,
+          bio,
+          phoneNumber, // Update the state with the new phone number
+          profilePicture: imageUrl, // Update the state with the new image URL
+        }));
+
+        setPassword(""); // Clear the password field
+        setIsEditing(false); // Disable edit mode
+      } catch (error) {
+        console.error("Reauthentication failed:", error);
+        setReauthError("Invalid password. Please try again."); // Show an error message
+      }
     }
   };
-
   const handleFileChange = async (event) => {
     const file = event.target.files[0];
     if (file) {
@@ -195,6 +227,7 @@ const Profile = () => {
                       )}
                       <input
                         type="file"
+                        accept=".jpeg, .png, .jpg"
                         onChange={handleFileChange}
                         className="bg-neutral-900 p-2 rounded-md w-full"
                         style={{ fontFamily: "Arial, sans-serif" }}
@@ -280,14 +313,42 @@ const Profile = () => {
                         className="bg-neutral-900 p-2 rounded-md w-full mb-2"
                       />
                     </div>
-                    <button
-                      type="button"
-                      className="text-white p-2 rounded-md bg-violet-500 hover:bg-violet-600 mt-4"
-                      style={{ fontFamily: "Bebas Neue, sans-serif" }}
-                      onClick={handleSave}
-                    >
-                      Save
-                    </button>
+                    <div>
+                      <label
+                        className="block text-lg font-medium mb-1"
+                        style={{ fontFamily: "Bebas Neue, sans-serif" }}
+                      >
+                        Password:
+                      </label>
+                      <input
+                        type="password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        className="bg-neutral-900 p-2 rounded-md w-full mb-2"
+                        placeholder="Enter your password to save changes"
+                      />
+                    </div>
+                    {reauthError && (
+                      <p className="text-red-500 mb-2">{reauthError}</p> // Display reauthentication error
+                    )}
+                    <div className="flex mt-4">
+                      <button
+                        type="button"
+                        className="text-white p-2 mr-4 rounded-md bg-violet-500 hover:bg-violet-600"
+                        style={{ fontFamily: "Bebas Neue, sans-serif" }}
+                        onClick={handleSave}
+                      >
+                        Save
+                      </button>
+                      <button
+                        type="button"
+                        className="text-white p-2 rounded-md bg-gray-500 hover:bg-gray-600"
+                        style={{ fontFamily: "Bebas Neue, sans-serif" }}
+                        onClick={handleCancel}
+                      >
+                        Cancel
+                      </button>
+                    </div>
                   </>
                 ) : (
                   <>
