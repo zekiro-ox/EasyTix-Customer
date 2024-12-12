@@ -228,8 +228,12 @@ const BuyTicketPage = () => {
         (ticket) => ticket.type === ticketType
       );
       if (selectedTicket) {
-        fetchSeatingConfiguration(selectedTicket); // Fetch seating configuration for the selected ticket type
-        setIsModalOpen(true); // Open modal if ticket type is not "None"
+        if (parseInt(selectedTicket.column) === 0) {
+          setIsModalOpen(false); // Close modal if column is 0
+        } else {
+          fetchSeatingConfiguration(selectedTicket); // Fetch seating configuration for the selected ticket type
+          setIsModalOpen(true);
+        } // Open modal if ticket type is not "None"
       } else {
         setIsModalOpen(false); // Close modal if "None" is selected
       }
